@@ -32,12 +32,38 @@ class KarmaBot(object):
         # Since our app is only going to be installed in one workspace, we can use the pre-generated
         # OAuth token that Slack gave us when we created our app.
         self.client = SlackClient(os.environ.get('BOT_OAUTH_TOKEN'))
+        self.karma = {}
 
         # TODO: Load JSON data into dictionary for saved karma values.
 
     def echo(self, message: str, channel_id: str):
-        print("echoing message: %s in channel %s" % (message, channel_id))
-        post_message = self.client.api_call('chat.postMessage', channel=channel_id,
-                                            username=self.username, icon_emoji=self.emoji,
-                                            text=message)
-        print(post_message)
+        self.send_message(message, channel_id)
+
+    def increment(self, item: str, channel_id: str):
+        if !self.karma.get(item):
+            self.karma[item] = Item()
+        self.karma[item].pluses += 1
+        _send_increment_message(item, channel_id)
+
+
+    def decrement(self, item: str, channel_id: str):
+        if !self.karma.get(item):
+            self.karma[item] = Item()
+        self.karma[item].minuses += 1
+        _send_decrement_message(item, channel_id)
+
+    def send_message(self, message: str, channel_id: str):
+        self.client.api_call(
+            'chat.postMessage',
+            channel=channel_id,
+            username=self.username,
+            icon_emoji=self.emoji,
+            text=message)
+
+    def _send_increment_message(self, item: str, channel_id: str):
+        message = 'Groovy. %s now has %s points.' % (item, self.karma[item].total_score)
+        send_message(message, channel_id)
+
+    def _send_decrement_message(self, item: str, channel_id: str):
+        message = 'Brutal. %s now has %s points.' % (item, self.karma[item].total_score)
+        send_message(message, channel_id)
