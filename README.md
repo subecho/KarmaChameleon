@@ -25,7 +25,7 @@ Karma Chameleon relies on `pip` to install its dependencies and is easiest to de
 ## Running the Bot in a Development Environment
 Before running the code, we need to do some initial setup on the Slack side so that Slack knows who we are, we are who we say we are, and which events we wish to subscribe to. You will need to create a new app in Slack and add the `channels:history` and `chat:write:bot` scopes to it.
 
-There are two steps to running the bot on your local machine: running the actual Python code and forwarding the port that the Flask server is running on to a publicly accessible URL. I used [ngrok](https://ngrok.com)to do this and it’s available via Brew on macOS.
+There are two steps to running the bot on your local machine: running the actual Python code and forwarding the port that the Flask server is running on to a publicly accessible URL. I used [ngrok](https://ngrok.com) to do this and it’s available via Brew on macOS.
 
 In one terminal window, run:
 `python3 EventManager.py`
