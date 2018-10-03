@@ -40,14 +40,14 @@ class KarmaBot(object):
         self.send_message(message, channel_id)
 
     def increment(self, item: str, channel_id: str):
-        if !self.karma.get(item):
+        if not self.karma.get(item):
             self.karma[item] = Item()
         self.karma[item].pluses += 1
         _send_increment_message(item, channel_id)
 
 
     def decrement(self, item: str, channel_id: str):
-        if !self.karma.get(item):
+        if not self.karma.get(item):
             self.karma[item] = Item()
         self.karma[item].minuses += 1
         _send_decrement_message(item, channel_id)
