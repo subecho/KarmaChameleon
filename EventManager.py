@@ -19,6 +19,7 @@ Provides the routing and management of interactions between Slack and the karma 
 """
 
 import json
+import re
 from Bot import KarmaBot
 from flask import Flask, request, make_response
 
