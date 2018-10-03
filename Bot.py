@@ -22,6 +22,8 @@ import os
 
 from slackclient import SlackClient
 
+from Item import Item
+
 class KarmaBot(object):
     def __init__(self):
         super(KarmaBot, self).__init__()
@@ -43,14 +45,14 @@ class KarmaBot(object):
         if not self.karma.get(item):
             self.karma[item] = Item()
         self.karma[item].pluses += 1
-        _send_increment_message(item, channel_id)
+        self._send_increment_message(item, channel_id)
 
 
     def decrement(self, item: str, channel_id: str):
         if not self.karma.get(item):
             self.karma[item] = Item()
         self.karma[item].minuses += 1
-        _send_decrement_message(item, channel_id)
+        self._send_decrement_message(item, channel_id)
 
     def send_message(self, message: str, channel_id: str):
         self.client.api_call(
@@ -62,8 +64,8 @@ class KarmaBot(object):
 
     def _send_increment_message(self, item: str, channel_id: str):
         message = 'Groovy. %s now has %s points.' % (item, self.karma[item].total_score)
-        send_message(message, channel_id)
+        self.send_message(message, channel_id)
 
     def _send_decrement_message(self, item: str, channel_id: str):
         message = 'Brutal. %s now has %s points.' % (item, self.karma[item].total_score)
-        send_message(message, channel_id)
+        self.send_message(message, channel_id)

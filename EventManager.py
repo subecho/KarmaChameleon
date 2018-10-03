@@ -47,7 +47,7 @@ def handle_event(event_type, event):
 
     # Ensure that the message we got is not from the bot itself
     if event_type == 'message' and event_detail.get('subtype') != 'bot_message':
-        message = event_detail['text']
+        message = event_detail.get('text', '')
         if increment_regex.match(message):
             karmaBot.increment(message[:-2], channel_id)
             return make_response('Got an increment message', 200)
@@ -88,4 +88,4 @@ def _create_invalid_verification_token_response(bad_token: str):
 
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(host='0.0.0.0', debug=True)
