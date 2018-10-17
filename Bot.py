@@ -19,10 +19,12 @@ Defines the bot that is listening for Slack events and responds to them accordin
 """
 import json
 import os
+from pathlib import Path
 
 from slackclient import SlackClient
 
-from Item import Item
+from KarmaItem import KarmaItem, KarmaItemEncoder
+
 
 class KarmaBot(object):
     def __init__(self):
@@ -35,24 +37,26 @@ class KarmaBot(object):
         # OAuth token that Slack gave us when we created our app.
         self.client = SlackClient(os.environ.get('BOT_OAUTH_TOKEN'))
         self.karma = {}
+        self.karma_file_path = os.environ.get('KARMA_FILE_PATH')
 
-        # TODO: Load JSON data into dictionary for saved karma values.
+        self._load_karma_from_file()
 
     def echo(self, message: str, channel_id: str):
         self.send_message(message, channel_id)
 
     def increment(self, item: str, channel_id: str):
         if not self.karma.get(item):
-            self.karma[item] = Item()
+            self.karma[item] = KarmaItem()
         self.karma[item].pluses += 1
         self._send_increment_message(item, channel_id)
-
+        self._save_karma_to_json_file()
 
     def decrement(self, item: str, channel_id: str):
         if not self.karma.get(item):
-            self.karma[item] = Item()
+            self.karma[item] = KarmaItem()
         self.karma[item].minuses += 1
         self._send_decrement_message(item, channel_id)
+        self._save_karma_to_json_file()
 
     def send_message(self, message: str, channel_id: str):
         self.client.api_call(
@@ -69,3 +73,15 @@ class KarmaBot(object):
     def _send_decrement_message(self, item: str, channel_id: str):
         message = 'Brutal. %s now has %s points.' % (item, self.karma[item].total_score)
         self.send_message(message, channel_id)
+
+    def _save_karma_to_json_file(self):
+        with open(self.karma_file_path, 'w') as fp:
+            json.dump(self.karma, fp, cls=KarmaItemEncoder)
+
+    def _load_karma_from_json_file(self):
+        karma_file = Path(self.karma_file_path)
+        if not karma_file.is_file():
+            print('No existing file found. Will start fresh.')
+        with open(self.karma_file_path, 'r'):
+            print('w0000000')
+

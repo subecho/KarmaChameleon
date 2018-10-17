@@ -29,6 +29,7 @@ app = Flask(__name__)
 increment_regex = re.compile(r'^\S+\+\+$')
 decrement_regex = re.compile(r'^\S+--$')
 
+
 def handle_event(event_type, event):
     """
     Routes events from Slack to our KarmaBot instance by type and subtype.
@@ -58,6 +59,7 @@ def handle_event(event_type, event):
     # At this point, we don't have a handler for this event, so send a response saying so.
     return make_response('No handler for %s' % event_type, 200, {'X-Slack-No-Retry': 1})
 
+
 @app.route('/karma', methods=['GET', 'POST'])
 def listen():
     """
@@ -77,8 +79,10 @@ def listen():
         event_type = event['event']['type']     
         return handle_event(event_type, event)
 
+
 def _create_challenge_response(challenge: str):
     return make_response(challenge, 200, {'content_type': 'application/json'})
+
 
 def _create_invalid_verification_token_response(bad_token: str):
     message = 'Invalid Slack verification token: %s' % bad_token, 

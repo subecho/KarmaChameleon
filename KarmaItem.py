@@ -18,13 +18,24 @@
 Implements an item that contains a number of positive and negative karma events as well as
 a calculated total score.
 """
-class Item(object):
-    def __init__(self):
-        super(Item, self).__init__()
-        self.pluses = 0
-        self.minuses = 0
+import json
+
+
+class KarmaItem(object):
+    def __init__(self, pluses: int = 0, minuses: int = 0):
+        super(KarmaItem, self).__init__()
+        self.pluses = pluses
+        self.minuses = minuses
 
     @property
     def total_score(self):
         return self.pluses - self.minuses
-    
+
+
+class KarmaItemEncoder(json.JSONEncoder):
+    def default(self, o):
+        if isinstance(o, KarmaItem):
+            return {'pluses': o.pluses, 'minuses': o.minuses}
+        return json.JSONEncoder.default(self, o)
+
+
