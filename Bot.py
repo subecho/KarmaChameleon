@@ -1,16 +1,16 @@
 # Karma Chameleon
 # Copyright (C) 2018 Dustin Schoenbrun
-# 
+#
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
 # (at your option) any later version.
-# 
+#
 # This program is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
-# 
+#
 # You should have received a copy of the GNU General Public License
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
@@ -39,7 +39,7 @@ class KarmaBot(object):
         self.karma = {}
         self.karma_file_path = os.environ.get('KARMA_FILE_PATH')
 
-        self._load_karma_from_file()
+        self._load_karma_from_json_file()
 
     def echo(self, message: str, channel_id: str):
         self.send_message(message, channel_id)
@@ -84,4 +84,3 @@ class KarmaBot(object):
             print('No existing file found. Will start fresh.')
         with open(self.karma_file_path, 'r'):
             print('w0000000')
-
