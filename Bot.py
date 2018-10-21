@@ -29,7 +29,7 @@ from KarmaItem import KarmaItem, KarmaItemEncoder
 class KarmaBot(object):
     def __init__(self):
         super(KarmaBot, self).__init__()
-        self.username = 'karmachameleon'
+        self.username = 'Karma Chameleon'
         self.emoji = ':lizard:'
         self.verification_token = os.environ.get('VERIFICATION_TOKEN')
 
@@ -39,21 +39,21 @@ class KarmaBot(object):
         self.karma = {}
         self.karma_file_path = os.environ.get('KARMA_FILE_PATH')
 
-        self._load_karma_from_file()
+        self._load_karma_from_json_file()
 
     def echo(self, message: str, channel_id: str):
         self.send_message(message, channel_id)
 
     def increment(self, item: str, channel_id: str):
         if not self.karma.get(item):
-            self.karma[item] = KarmaItem()
+            self.karma[item] = KarmaItem(item)
         self.karma[item].pluses += 1
         self._send_increment_message(item, channel_id)
         self._save_karma_to_json_file()
 
     def decrement(self, item: str, channel_id: str):
         if not self.karma.get(item):
-            self.karma[item] = KarmaItem()
+            self.karma[item] = KarmaItem(item)
         self.karma[item].minuses += 1
         self._send_decrement_message(item, channel_id)
         self._save_karma_to_json_file()
@@ -75,13 +75,17 @@ class KarmaBot(object):
         self.send_message(message, channel_id)
 
     def _save_karma_to_json_file(self):
+        karma_list = list(self.karma.values())
         with open(self.karma_file_path, 'w') as fp:
-            json.dump(self.karma, fp, cls=KarmaItemEncoder)
+            json.dump(karma_list, fp, cls=KarmaItemEncoder)
 
     def _load_karma_from_json_file(self):
         karma_file = Path(self.karma_file_path)
         if not karma_file.is_file():
             print('No existing file found. Will start fresh.')
-        with open(self.karma_file_path, 'r'):
-            print('w0000000')
+            return
+        with open(self.karma_file_path, 'r') as fp:
+            karma_list = json.load(fp, object_hook=KarmaItem.dict_to_karmaitem)
+        for item in karma_list:
+            self.karma[item.name] = item
 
