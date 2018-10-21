@@ -16,11 +16,13 @@ In a channel where Karma Chameleon is present, do the following to remove a poin
 ## Setting up a Development Environment
 Karma Chameleon relies on `pip` to install its dependencies and is easiest to develop with a Python Virtual Environment.
 
-`git clone https://github.com/subecho/KarmaChameleon.git`
-`cd KarmaChameleon`
-`virtualenv .venv`
-`source .venv/bin/activate`
-`pip install -r requirements.txt`
+```
+$ git clone https://github.com/subecho/KarmaChameleon.git
+$ cd KarmaChameleon
+$ virtualenv .venv
+$ source .venv/bin/activate
+(.venv) $ pip install -r requirements.txt
+```
 
 ## Running the Bot in a Development Environment
 Before running the code, we need to do some initial setup on the Slack side so that Slack knows who we are, we are who we say we are, and which events we wish to subscribe to. You will need to create a new app in Slack and add the `channels:history` and `chat:write:bot` scopes to it.
