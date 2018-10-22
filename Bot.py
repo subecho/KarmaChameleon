@@ -24,6 +24,7 @@ from pathlib import Path
 from slackclient import SlackClient
 
 from KarmaItem import KarmaItem, KarmaItemEncoder
+from Snark import get_positive_message, get_negative_message
 
 
 class KarmaBot(object):
@@ -67,11 +68,11 @@ class KarmaBot(object):
             text=message)
 
     def _send_increment_message(self, item: str, channel_id: str):
-        message = 'Groovy. %s now has %s points.' % (item, self.karma[item].total_score)
+        message = '%s %s now has %s points.' % (get_positive_message(), item, self.karma[item].total_score)
         self.send_message(message, channel_id)
 
     def _send_decrement_message(self, item: str, channel_id: str):
-        message = 'Brutal. %s now has %s points.' % (item, self.karma[item].total_score)
+        message = '%s %s now has %s points.' % (get_negative_message(), item, self.karma[item].total_score)
         self.send_message(message, channel_id)
 
     def _save_karma_to_json_file(self):
