@@ -26,8 +26,8 @@ from flask import Flask, request, make_response
 karmaBot = KarmaBot()
 app = Flask(__name__)
 
-increment_regex = re.compile(r'^\S+\+\+$')
-decrement_regex = re.compile(r'^\S+--$')
+increment_regex = re.compile(r'^\S+\s?\+\+$')
+decrement_regex = re.compile(r'^\S+\s?--$')
 
 
 def handle_event(event_type, event):
