@@ -1,7 +1,8 @@
 # Karma Chameleon
-A simple karma bot for Slack. 
+A simple karma bot for Slack.
 
-This is a simple, standalone Slack bot that watches for “karma events” and will keep track of scores for users and topics.
+This is a simple, standalone Slack bot that watches for “karma events” and will keep track of scores
+for users and topics.
 
 ## Adding Karma
 In a channel where Karma Chameleon is present, do the following to add a point to a user or topic.
@@ -19,9 +20,9 @@ Karma Chameleon relies on `pip` to install its dependencies and is easiest to de
 ```
 $ git clone https://github.com/subecho/KarmaChameleon.git
 $ cd KarmaChameleon
-$ virtualenv .venv
+$ python3 -m venv .venv
 $ source .venv/bin/activate
-(.venv) $ pip install -r requirements.txt
+(.venv) $ python3 -m pip install -r requirements.txt
 ```
 
 ## Running the Bot in a Development Environment

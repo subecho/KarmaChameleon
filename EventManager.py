@@ -1,16 +1,16 @@
 # Karma Chameleon
 # Copyright (C) 2018 Dustin Schoenbrun
-# 
+#
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
 # (at your option) any later version.
-# 
+#
 # This program is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
-# 
+#
 # You should have received a copy of the GNU General Public License
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
@@ -76,7 +76,7 @@ def listen():
         return _create_invalid_verification_token_response(event.get('token'))
 
     if 'event' in event:
-        event_type = event['event']['type']     
+        event_type = event['event']['type']
         return handle_event(event_type, event)
 
 
@@ -85,7 +85,7 @@ def _create_challenge_response(challenge: str):
 
 
 def _create_invalid_verification_token_response(bad_token: str):
-    message = 'Invalid Slack verification token: %s' % bad_token, 
+    message = 'Invalid Slack verification token: %s' % bad_token,
     # Adding 'X-Slack-No-Retry': 1 to our response header turns off Slack's auto retries while we
     # develop.
     return make_response(message, 403, {'X-Slack-No-Retry': 1})
