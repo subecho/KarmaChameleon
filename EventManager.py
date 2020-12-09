@@ -49,11 +49,15 @@ def handle_event(event_type, event):
     # Ensure that the message we got is not from the bot itself
     if event_type == 'message' and event_detail.get('subtype') != 'bot_message':
         message = event_detail.get('text', '')
+        # Clean up the message...
+        # Format should be (TOKEN(++|--) trailing_garbage).  All we need to do here is get the first
+        # token and strip off the last two chars.
+        message = message.split()[0]
         if increment_regex.match(message):
-            karmaBot.increment(message[:-2].rstrip(), channel_id)
+            karmaBot.increment(message[:-2], channel_id)
             return make_response('Got an increment message', 200)
         elif decrement_regex.match(message):
-            karmaBot.decrement(message[:-2].rstrip(), channel_id)
+            karmaBot.decrement(message[:-2], channel_id)
             return make_response('Got a decrement message', 200)
 
     # At this point, we don't have a handler for this event, so send a response saying so.
