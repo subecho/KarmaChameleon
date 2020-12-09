@@ -56,17 +56,17 @@ def handle_event(event_type, event):
             karmaBot.chastise(('++' in message), channel_id)
             return make_response('Got a self bump', 200)
 
-        # Clean up the message...
-        # Format should be (TOKEN(++|--) trailing_garbage).  All we need to do here is get the first
-        # token and strip off the last two chars.
-        print(message)
-        message = message.split()[0]
-        if increment_regex.match(message):
-            karmaBot.increment(message[:-2], channel_id)
-            return make_response('Got an increment message', 200)
-        elif decrement_regex.match(message):
-            karmaBot.decrement(message[:-2], channel_id)
-            return make_response('Got a decrement message', 200)
+        if message:
+            # Clean up the message...
+            # Format should be (TOKEN(++|--) trailing_garbage).  All we need to do here is get the first
+            # token and strip off the last two chars.
+            message = message.split()[0]
+            if increment_regex.match(message):
+                karmaBot.increment(message[:-2], channel_id)
+               return make_response('Got an increment message', 200)
+            elif decrement_regex.match(message):
+                karmaBot.decrement(message[:-2], channel_id)
+                return make_response('Got a decrement message', 200)
 
     # At this point, we don't have a handler for this event, so send a response saying so.
     return make_response('No handler for %s' % event_type, 500, {'X-Slack-No-Retry': 1})
