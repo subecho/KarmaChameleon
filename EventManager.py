@@ -45,7 +45,8 @@ def handle_event(event_type, event):
     event_detail = event['event']
     team_id = event['team_id']
     channel_id = event_detail['channel']
-    sending_usr = event_detail['user']
+    print(event)
+    #sending_usr = event_detail['user']
 
     # Ensure that the message we got is not from the bot itself
     if event_type == 'message' and event_detail.get('subtype') != 'bot_message':
@@ -54,9 +55,9 @@ def handle_event(event_type, event):
         # Format should be (TOKEN(++|--) trailing_garbage).  All we need to do here is get the first
         # token and strip off the last two chars.
         message = message.split()[0]
-        if sending_usr in message:
-            print('Skipping self plus or decrement')
-            return make_response('Got a self bump', 200)
+        #if sending_usr in message:
+        #    print('Skipping self plus or decrement')
+        #    return make_response('Got a self bump', 200)
         if increment_regex.match(message):
             karmaBot.increment(message[:-2], channel_id)
             return make_response('Got an increment message', 200)
