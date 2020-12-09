@@ -63,7 +63,7 @@ def handle_event(event_type, event):
             message = message.split()[0]
             if increment_regex.match(message):
                 karmaBot.increment(message[:-2], channel_id)
-               return make_response('Got an increment message', 200)
+                return make_response('Got an increment message', 200)
             elif decrement_regex.match(message):
                 karmaBot.decrement(message[:-2], channel_id)
                 return make_response('Got a decrement message', 200)
