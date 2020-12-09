@@ -55,9 +55,8 @@ def handle_event(event_type, event):
         # token and strip off the last two chars.
         message = message.split()[0]
         if sending_usr in message:
-            print('++' in message)
             print('Skipping self bump')
-            #karmaBot.chastise(inc=)
+            karmaBot.chastise(('++' in message), channel_id)
             return make_response('Got a self bump', 200)
         if increment_regex.match(message):
             karmaBot.increment(message[:-2], channel_id)
