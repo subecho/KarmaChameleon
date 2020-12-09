@@ -59,6 +59,7 @@ def handle_event(event_type, event):
         # Clean up the message...
         # Format should be (TOKEN(++|--) trailing_garbage).  All we need to do here is get the first
         # token and strip off the last two chars.
+        print message
         message = message.split()[0]
         if increment_regex.match(message):
             karmaBot.increment(message[:-2], channel_id)
