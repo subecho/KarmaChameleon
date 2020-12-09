@@ -70,7 +70,6 @@ def handle_event(event_type, event):
             return make_response('Got a self bump', 200)
 
         if message:
-
             print(message)
             if increment_regex.match(message):
                 karmaBot.increment(clean_up_message(message), channel_id)
@@ -79,7 +78,7 @@ def handle_event(event_type, event):
                 karmaBot.decrement(clean_up_message(message), channel_id)
                 return make_response('Got a decrement message', 200)
             else:
-                print('WRIDEOUT NO MATCH!!!')
+                print('no regex match')
 
     # At this point, we don't have a handler for this event, so send a response saying so.
     return make_response('No handler for %s' % event_type, 500, {'X-Slack-No-Retry': 1})
