@@ -51,9 +51,8 @@ def handle_event(event_type, event):
         # Prevent users from ++ or -- themselves.
         sending_usr = event_detail['user']
         message = event_detail.get('text', '')
-        print(message)
         if sending_usr in message:
-            print('Skipping self bump.)
+            print('Skipping self bump.')
             karmaBot.chastise(('++' in message), channel_id)
             return make_response('Got a self bump', 200)
 
