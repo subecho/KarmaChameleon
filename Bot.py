@@ -21,7 +21,7 @@ import json
 import os
 from pathlib import Path
 
-from slackclient import SlackClient
+from slack import WebClient
 
 from KarmaItem import KarmaItem, KarmaItemEncoder
 from Snark import get_positive_message, get_negative_message
@@ -36,7 +36,8 @@ class KarmaBot(object):
 
         # Since our app is only going to be installed in one workspace, we can use the pre-generated
         # OAuth token that Slack gave us when we created our app.
-        self.client = SlackClient(os.environ.get('BOT_OAUTH_TOKEN'))
+        self.oauth_token = os.environ.get('BOT_OAUTH_TOKEN')
+        self.client = WebClient(self.oauth_token)
         self.karma = {}
         self.karma_file_path = os.environ.get('KARMA_FILE_PATH')
 
@@ -59,13 +60,22 @@ class KarmaBot(object):
         self._send_decrement_message(item, channel_id)
         self._save_karma_to_json_file()
 
+    def chastise(self, inc: bool, channel_id: str):
+        if inc:
+            self._send_chastise_message(channel_id)
+        else:
+            self._send_encouragement_message(channel_id)
+
     def send_message(self, message: str, channel_id: str):
         self.client.api_call(
-            'chat.postMessage',
-            channel=channel_id,
-            username=self.username,
-            icon_emoji=self.emoji,
-            text=message)
+            api_method='chat.postMessage',
+            json={
+                    'token': self.oauth_token,
+                    'channel': channel_id,
+                    'text': message,
+                    'username': self.username,
+                    'icon_emoji': self.emoji,
+            })
 
     def _send_increment_message(self, item: str, channel_id: str):
         message = '%s %s now has %s points.' % (get_positive_message(), item, self.karma[item].total_score)
@@ -74,6 +84,12 @@ class KarmaBot(object):
     def _send_decrement_message(self, item: str, channel_id: str):
         message = '%s %s now has %s points.' % (get_negative_message(), item, self.karma[item].total_score)
         self.send_message(message, channel_id)
+
+    def _send_chastise_message(self, channel_id: str):
+        self.send_message('Ahem, no self-bumping...', channel_id)
+
+    def _send_encouragement_message(self, channel_id: str):
+        self.send_message("Now, now.  Don't be so hard on yourself!", channel_id)
 
     def _save_karma_to_json_file(self):
         karma_list = list(self.karma.values())
