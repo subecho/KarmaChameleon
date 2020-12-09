@@ -53,7 +53,7 @@ def handle_event(event_type, event):
         message = event_detail.get('text', '')
         print(message)
         if sending_usr in message:
-            print('Skipping self bump: %s' % '++' in message)
+            print('Skipping self bump.)
             karmaBot.chastise(('++' in message), channel_id)
             return make_response('Got a self bump', 200)
 
