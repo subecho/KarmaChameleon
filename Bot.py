@@ -36,7 +36,8 @@ class KarmaBot(object):
 
         # Since our app is only going to be installed in one workspace, we can use the pre-generated
         # OAuth token that Slack gave us when we created our app.
-        self.client = WebClient(os.environ.get('BOT_OAUTH_TOKEN'))
+        self.oauth_token = os.environ.get('BOT_OAUTH_TOKEN')
+        self.client = WebClient(self.oauth_token)
         self.karma = {}
         self.karma_file_path = os.environ.get('KARMA_FILE_PATH')
 
@@ -61,11 +62,14 @@ class KarmaBot(object):
 
     def send_message(self, message: str, channel_id: str):
         self.client.api_call(
-            'chat.postMessage',
-            channel=channel_id,
-            username=self.username,
-            icon_emoji=self.emoji,
-            text=message)
+            api_method='chat.postMessage',
+            json={
+                    'token': self.oauth_token,
+                    'channel': channel_id,
+                    'text': message,
+                    'username': self.username,
+                    'icon_emoji': self.emoji,
+            })
 
     def _send_increment_message(self, item: str, channel_id: str):
         message = '%s %s now has %s points.' % (get_positive_message(), item, self.karma[item].total_score)
