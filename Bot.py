@@ -60,6 +60,12 @@ class KarmaBot(object):
         self._send_decrement_message(item, channel_id)
         self._save_karma_to_json_file()
 
+    def chastise(self, inc: bool, channel_id: str):
+        if inc:
+            self._send_chastise_message(channel_id)
+        else:
+            self._send_encouragement_message(channel_id)
+
     def send_message(self, message: str, channel_id: str):
         self.client.api_call(
             api_method='chat.postMessage',
@@ -78,6 +84,12 @@ class KarmaBot(object):
     def _send_decrement_message(self, item: str, channel_id: str):
         message = '%s %s now has %s points.' % (get_negative_message(), item, self.karma[item].total_score)
         self.send_message(message, channel_id)
+
+    def _send_chastise_message(self, channel_id: str):
+        self.send_message('Ahem, no self-bumping...', channel_id)
+
+    def _send_encouragement_message(self, channel_id: str):
+        self.send_message("Now, now.  Don't be so hard on yourself!", channel_id)
 
     def _save_karma_to_json_file(self):
         karma_list = list(self.karma.values())
