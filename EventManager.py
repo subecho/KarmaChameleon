@@ -29,6 +29,19 @@ app = Flask(__name__)
 increment_regex = re.compile(r'^\S+\s?\+\+.*$')
 decrement_regex = re.compile(r'^\S+\s?--.*$')
 
+def clean_up_message(message):
+    """Clean up the passed message.
+
+    Format should be (TOKEN(++|--) trailing_garbage).  All we need to do here is get the first
+    token and strip off the last two chars.
+
+    Returns:
+    Cleaned message.
+    """
+    message = message.split()[0]
+    if '++' in message or '--' in message:
+        message = message[:-2]
+    return message
 
 def handle_event(event_type, event):
     """
@@ -57,16 +70,13 @@ def handle_event(event_type, event):
             return make_response('Got a self bump', 200)
 
         if message:
-            # Clean up the message...
-            # Format should be (TOKEN(++|--) trailing_garbage).  All we need to do here is get the first
-            # token and strip off the last two chars.
-            #message = message.split()[0]
+
             print(message)
             if increment_regex.match(message):
-                karmaBot.increment(message.split()[0], channel_id)
+                karmaBot.increment(clean_up_message(message), channel_id)
                 return make_response('Got an increment message', 200)
             elif decrement_regex.match(message):
-                karmaBot.decrement(message.split()[0], channel_id)
+                karmaBot.decrement(clean_up_message(message), channel_id)
                 return make_response('Got a decrement message', 200)
             else:
                 print('WRIDEOUT NO MATCH!!!')
