@@ -14,6 +14,9 @@ In a channel where Karma Chameleon is present, do the following to remove a poin
 
 `@user—-`
 
+Note that decementing or incrementing a user's own karma (the self-bump) is not a valid operation.
+You will be chastised by the Chameleon.
+
 ## Setting up a Development Environment
 Karma Chameleon relies on `pip` to install its dependencies and is easiest to develop with a Python Virtual Environment.
 
