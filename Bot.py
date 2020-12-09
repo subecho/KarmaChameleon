@@ -21,7 +21,7 @@ import json
 import os
 from pathlib import Path
 
-from slackclient import SlackClient
+from slack import WebClient
 
 from KarmaItem import KarmaItem, KarmaItemEncoder
 from Snark import get_positive_message, get_negative_message
@@ -36,7 +36,7 @@ class KarmaBot(object):
 
         # Since our app is only going to be installed in one workspace, we can use the pre-generated
         # OAuth token that Slack gave us when we created our app.
-        self.client = SlackClient(os.environ.get('BOT_OAUTH_TOKEN'))
+        self.client = WebClient(os.environ.get('BOT_OAUTH_TOKEN'))
         self.karma = {}
         self.karma_file_path = os.environ.get('KARMA_FILE_PATH')
 
