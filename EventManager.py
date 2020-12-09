@@ -49,10 +49,9 @@ def handle_event(event_type, event):
     # Ensure that the message we got is not from the bot itself
     if event_type == 'message' and event_detail.get('subtype') != 'bot_message':
         # Prevent users from ++ or -- themselves.
-        sending_usr = event_detail['user']
+        sending_usr = event_detail.get('user')
         message = event_detail.get('text', '')
-        print(message)
-        if sending_usr in message:
+        if sending_usr and sending_usr in message:
             print('Skipping self bump.')
             karmaBot.chastise(('++' in message), channel_id)
             return make_response('Got a self bump', 200)
