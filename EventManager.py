@@ -56,7 +56,7 @@ def handle_event(event_type, event):
         message = message.split()[0]
         if sending_usr in message:
             print('Skipping self plus or decrement')
-            return
+            return make_response('Got a self bump', 200)
         if increment_regex.match(message):
             karmaBot.increment(message[:-2], channel_id)
             return make_response('Got an increment message', 200)
@@ -65,7 +65,7 @@ def handle_event(event_type, event):
             return make_response('Got a decrement message', 200)
 
     # At this point, we don't have a handler for this event, so send a response saying so.
-    return make_response('No handler for %s' % event_type, 200, {'X-Slack-No-Retry': 1})
+    return make_response('No handler for %s' % event_type, 500, {'X-Slack-No-Retry': 1})
 
 
 @app.route('/karma', methods=['GET', 'POST'])
