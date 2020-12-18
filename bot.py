@@ -23,13 +23,15 @@ from pathlib import Path
 
 from slack import WebClient
 
-from KarmaItem import KarmaItem, KarmaItemEncoder
-from Snark import get_positive_message, get_negative_message
+from karma_item import KarmaItem, KarmaItemEncoder
+from snark import get_positive_message, get_negative_message
 
-
-class KarmaBot(object):
+class KarmaBot:
+    """Basic Bot object which is able to read incoming messages from Slack and send responses.
+    The bot is also able to read karma from the json save-file, and make changes to the same.
+    """
     def __init__(self):
-        super(KarmaBot, self).__init__()
+        super().__init__()
         self.username = 'Karma Chameleon'
         self.emoji = ':lizard:'
         self.verification_token = os.environ.get('VERIFICATION_TOKEN')
@@ -44,9 +46,22 @@ class KarmaBot(object):
         self._load_karma_from_json_file()
 
     def echo(self, message: str, channel_id: str):
+        """Send a message
+
+        Arguments:
+        message -- message to be sent
+        channel_id -- channel to which the message will be sent
+        """
         self.send_message(message, channel_id)
 
     def increment(self, item: str, channel_id: str):
+        """Increment karma for a passed item, and send a corresponding message to the channel inside
+        which the karma was bumped.
+
+        Parameters:
+        item -- Name of the item for which karma will be changed
+        channel_id -- ID of the channel in which the karma action was taken.
+        """
         if not self.karma.get(item):
             self.karma[item] = KarmaItem(item)
         self.karma[item].pluses += 1
@@ -54,6 +69,13 @@ class KarmaBot(object):
         self._save_karma_to_json_file()
 
     def decrement(self, item: str, channel_id: str):
+        """Decrement karma for a passed item, and send a corresponding message to the channel inside
+        which the karma was bumped.
+
+        Parameters:
+        item -- Name of the item for which karma will be changed
+        channel_id -- ID of the channel in which the karma action was taken.
+        """
         if not self.karma.get(item):
             self.karma[item] = KarmaItem(item)
         self.karma[item].minuses += 1
@@ -61,12 +83,25 @@ class KarmaBot(object):
         self._save_karma_to_json_file()
 
     def chastise(self, inc: bool, channel_id: str):
+        """Send a chastise message to users who attempt to increment their own karma, and
+        encouragement to those who decrement their own karma.
+
+        Arguments:
+        inc -- True if the action was an increment, False otherwise
+        channel_id -- Channel in which the karma action was taken
+        """
         if inc:
             self._send_chastise_message(channel_id)
         else:
             self._send_encouragement_message(channel_id)
 
     def send_message(self, message: str, channel_id: str):
+        """Send a message to the passed Slack channel.
+
+        Arguments:
+        message -- message to be sent
+        channel_id -- target channel for the message
+        """
         self.client.api_call(
             api_method='chat.postMessage',
             json={
@@ -78,11 +113,13 @@ class KarmaBot(object):
             })
 
     def _send_increment_message(self, item: str, channel_id: str):
-        message = '%s %s now has %s points.' % (get_positive_message(), item, self.karma[item].total_score)
+        message = '%s %s now has %s points.' % (get_positive_message(), item,
+                self.karma[item].total_score)
         self.send_message(message, channel_id)
 
     def _send_decrement_message(self, item: str, channel_id: str):
-        message = '%s %s now has %s points.' % (get_negative_message(), item, self.karma[item].total_score)
+        message = '%s %s now has %s points.' % (get_negative_message(), item,
+                self.karma[item].total_score)
         self.send_message(message, channel_id)
 
     def _send_chastise_message(self, channel_id: str):
@@ -93,15 +130,15 @@ class KarmaBot(object):
 
     def _save_karma_to_json_file(self):
         karma_list = list(self.karma.values())
-        with open(self.karma_file_path, 'w') as fp:
-            json.dump(karma_list, fp, cls=KarmaItemEncoder)
+        with open(self.karma_file_path, 'w') as file_ptr:
+            json.dump(karma_list, file_ptr, cls=KarmaItemEncoder)
 
     def _load_karma_from_json_file(self):
         karma_file = Path(self.karma_file_path)
         if not karma_file.is_file():
             print('No existing file found. Will start fresh.')
             return
-        with open(self.karma_file_path, 'r') as fp:
-            karma_list = json.load(fp, object_hook=KarmaItem.dict_to_karmaitem)
+        with open(self.karma_file_path, 'r') as file_ptr:
+            karma_list = json.load(file_ptr, object_hook=KarmaItem.dict_to_karmaitem)
         for item in karma_list:
             self.karma[item.name] = item

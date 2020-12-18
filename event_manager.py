@@ -20,8 +20,8 @@ Provides the routing and management of interactions between Slack and the karma 
 
 import json
 import re
-from Bot import KarmaBot
 from flask import Flask, request, make_response
+from bot import KarmaBot
 
 karmaBot = KarmaBot()
 app = Flask(__name__)
@@ -47,7 +47,7 @@ def handle_event(event_type, event):
     """
     Routes events from Slack to our KarmaBot instance by type and subtype.
 
-    Keyword arguments:
+    Arguments:
     event_type -- A string representing the type of event received from Slack.
     event -- The dictionary representing the JSON event from Slack.
 
@@ -56,7 +56,6 @@ def handle_event(event_type, event):
     event handler for the given event type.
     """
     event_detail = event['event']
-    team_id = event['team_id']
     channel_id = event_detail['channel']
 
     # Ensure that the message we got is not from the bot itself
@@ -75,11 +74,10 @@ def handle_event(event_type, event):
             if increment_regex.match(message):
                 karmaBot.increment(clean_up_message(message), channel_id)
                 return make_response('Got an increment message', 200)
-            elif decrement_regex.match(message):
+            if decrement_regex.match(message):
                 karmaBot.decrement(clean_up_message(message), channel_id)
                 return make_response('Got a decrement message', 200)
-            else:
-                print('no regex match')
+            print('no regex match')
 
     # At this point, we don't have a handler for this event, so send a response saying so.
     return make_response('No handler for %s' % event_type, 500, {'X-Slack-No-Retry': 1})
@@ -104,13 +102,15 @@ def listen():
         event_type = event['event']['type']
         return handle_event(event_type, event)
 
+    return None
+
 
 def _create_challenge_response(challenge: str):
     return make_response(challenge, 200, {'content_type': 'application/json'})
 
 
 def _create_invalid_verification_token_response(bad_token: str):
-    message = 'Invalid Slack verification token: %s' % bad_token,
+    message = 'Invalid Slack verification token: %s' % bad_token
     # Adding 'X-Slack-No-Retry': 1 to our response header turns off Slack's auto retries while we
     # develop.
     return make_response(message, 403, {'X-Slack-No-Retry': 1})
