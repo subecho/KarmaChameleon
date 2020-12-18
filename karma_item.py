@@ -20,10 +20,10 @@ and minuses.
 """
 import json
 
-class KarmaItem(object):
+class KarmaItem():
     """Object representation of a thing, and the karma associated with that thing."""
     def __init__(self, name: str, pluses: int = 0, minuses: int = 0):
-        super(KarmaItem, self).__init__()
+        super().__init__()
         self.name = name
         self.pluses = pluses
         self.minuses = minuses
@@ -89,4 +89,4 @@ class KarmaItemEncoder(json.JSONEncoder):
     def default(self, o):
         if isinstance(o, KarmaItem):
             return {'name': o.name, 'pluses': o.pluses, 'minuses': o.minuses}
-        return super(KarmaItemEncoder, self).default(o)
+        return super().default(o)
