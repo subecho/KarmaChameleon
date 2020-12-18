@@ -21,7 +21,7 @@ Provides the routing and management of interactions between Slack and the karma 
 import json
 import re
 from flask import Flask, request, make_response
-from Bot import KarmaBot
+from bot import KarmaBot
 
 karmaBot = KarmaBot()
 app = Flask(__name__)
@@ -47,7 +47,7 @@ def handle_event(event_type, event):
     """
     Routes events from Slack to our KarmaBot instance by type and subtype.
 
-    Keyword arguments:
+    Arguments:
     event_type -- A string representing the type of event received from Slack.
     event -- The dictionary representing the JSON event from Slack.
 
