@@ -20,8 +20,8 @@ Provides the routing and management of interactions between Slack and the karma 
 
 import json
 import re
-from Bot import KarmaBot
 from flask import Flask, request, make_response
+from Bot import KarmaBot
 
 karmaBot = KarmaBot()
 app = Flask(__name__)
@@ -56,7 +56,6 @@ def handle_event(event_type, event):
     event handler for the given event type.
     """
     event_detail = event['event']
-    team_id = event['team_id']
     channel_id = event_detail['channel']
 
     # Ensure that the message we got is not from the bot itself

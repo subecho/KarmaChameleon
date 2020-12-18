@@ -24,10 +24,12 @@ from pathlib import Path
 from slack import WebClient
 
 from KarmaItem import KarmaItem, KarmaItemEncoder
-from Snark import get_positive_message, get_negative_message
-
+from snark import get_positive_message, get_negative_message
 
 class KarmaBot(object):
+    """Basic Bot object which is able to read incoming messages from Slack and send responses.
+    The bot is also able to read karma from the json save-file, and make changes to the same.
+    """
     def __init__(self):
         super(KarmaBot, self).__init__()
         self.username = 'Karma Chameleon'

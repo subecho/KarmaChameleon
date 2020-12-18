@@ -14,6 +14,8 @@
 # You should have received a copy of the GNU General Public License
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
+"""Snark contains super-clever responses for the Chameleon to use."""
+
 import random
 
 positive_messages = [
@@ -115,10 +117,10 @@ negative_messages = [
     'Sub-par.',
 ]
 
-
 def get_positive_message():
+    """Return a random selection from positive_messages"""
     return random.choice(positive_messages)
 
-
 def get_negative_message():
+    """Return a random selection from negative_messages"""
     return random.choice(negative_messages)
