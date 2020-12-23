@@ -77,7 +77,6 @@ class KarmaItem():
             return KarmaItem(a_dict['name'], a_dict['pluses'], a_dict['minuses'])
         return a_dict
 
-
 class KarmaItemEncoder(json.JSONEncoder):
     """
     This class defines how to JSON Serialize our KarmaItem class. We do this via implementing the
