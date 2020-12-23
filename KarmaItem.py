@@ -19,7 +19,6 @@ Implements an item which stores a name and that thing's karma score as a factor 
 """
 import json
 
-
 class KarmaItem(object):
     def __init__(self, name: str, pluses: int = 0, minuses: int = 0):
         super(KarmaItem, self).__init__()
@@ -72,7 +71,6 @@ class KarmaItem(object):
             return KarmaItem(a_dict['name'], a_dict['pluses'], a_dict['minuses'])
         return a_dict
 
-
 class KarmaItemEncoder(json.JSONEncoder):
     """
     This class defines how to JSON Serialize our KarmaItem class. We do this via implementing the default() function
@@ -84,4 +82,3 @@ class KarmaItemEncoder(json.JSONEncoder):
         if isinstance(o, KarmaItem):
             return {'name': o.name, 'pluses': o.pluses, 'minuses': o.minuses}
         return super(KarmaItemEncoder, self).default(o)
-
