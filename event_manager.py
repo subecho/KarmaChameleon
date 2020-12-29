@@ -112,18 +112,9 @@ def slash_command():
     Listens for incoming leaderboard commands and sends them to the bot
     to formulate a response.
     """
-    # Parse the parameters you need
-    token = request.form.get('token', None)  # TODO: validate the token
-    command = request.form.get('command', None)
     args = request.form.get('text', None)
     channel_id = request.form.get('channel_id', None)
-
-    # Validate the request parameters
-    if not token:  # or some other failure condition
-        abort(400)
-    # Use one of the following return statements
-    # 1. Return plain text
-    karmaBot.leaderboard_image(args, channel_id)
+    karmaBot.display_leaderboards(args, channel_id)
     return make_response('Leaderboard displayed.', 200)
 
 
