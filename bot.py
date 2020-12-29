@@ -19,6 +19,10 @@ Defines the bot that is listening for Slack events and responds to them accordin
 """
 import json
 import os
+import plotly.figure_factory as ff
+from plotly.subplots import make_subplots
+import pandas as pd
+
 from pathlib import Path
 
 from slack import WebClient
@@ -94,6 +98,63 @@ class KarmaBot:
             self._send_chastise_message(channel_id)
         else:
             self._send_encouragement_message(channel_id)
+
+    def leaderboard_image(self, args: str, channel_id: str):
+        """
+            Code to print a rudimentary leaderboard.
+        """
+
+        curKarma = pd.read_json(self.karma_file_path)
+        curKarma['Net score'] = curKarma.apply(lambda x: x['pluses']
+                                               - x['minuses'], axis = 1)
+        curKarma = curKarma.sort_values(by = ['Net score'], ascending = False)
+        userKarma = curKarma[curKarma['name'].str.startswith('<@')]
+        thingKarma = pd.concat([curKarma,userKarma]).drop_duplicates(keep=False)
+
+        request = self.client.users_list()
+        rows = []
+        if request['ok']:
+            for item in request['members']:
+                rows.append([item['id'], item['real_name']])
+        ids_to_names = pd.DataFrame(rows, columns=['name', 'real_name'])
+        ids_to_names['name'] = "<@" + ids_to_names['name'] + ">"
+        userKarma = pd.merge(userKarma, ids_to_names, on='name', how='inner')
+        userKarma['name'] = userKarma['real_name']
+        del userKarma['real_name']
+
+        # Unfortunately Markdown or other plaintext pretty-table packages do not
+        # render properly in Slack messages, so we need to save and show an
+        # image to display nicely :\
+        userTable =  ff.create_table(userKarma)
+        thingTable = ff.create_table(thingKarma)
+
+        # Embedding two tables in subplots is a huge pain in the ass.
+        fig = make_subplots(rows=2,
+                          cols=1,
+                          print_grid=False,
+                          vertical_spacing=0.085,
+                          subplot_titles=('User karma', 'Thing karma'))
+        fig.add_trace(userTable.data[0], 1, 1)
+        fig.add_trace(thingTable.data[0], 2, 1)
+        fig.layout.xaxis.update(userTable.layout.xaxis)
+        fig.layout.yaxis.update(userTable.layout.yaxis)
+        fig.layout.xaxis2.update(thingTable.layout.xaxis)
+        fig.layout.yaxis2.update(thingTable.layout.yaxis)
+        for k in range(len(thingTable.layout.annotations)):
+            thingTable.layout.annotations[k].update(xref='x2', yref='y2')
+        all_annots = fig.layout.annotations + userTable.layout.annotations + thingTable.layout.annotations
+        fig.layout.annotations = all_annots
+        leaderboard_location = os.path.dirname(self.karma_file_path) + "/leaderboard.png"
+        fig.write_image(leaderboard_location, scale=2)
+
+        response = self.client.files_upload(
+            file=leaderboard_location,
+            initial_comment='The current leaderboards are:',
+            channels=channel_id,
+            username = self.username,
+            icon_emoji = self.emoji
+        )
+
 
     def send_message(self, message: str, channel_id: str):
         """Send a message to the passed Slack channel.
