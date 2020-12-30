@@ -99,10 +99,7 @@ class KarmaBot:
             self._send_encouragement_message(channel_id)
 
     def display_leaderboards(self, args: str, channel_id: str):
-        """
-            Code to print rudimentary user and thing leaderboards.
-        """
-
+        """Code to print rudimentary user and thing leaderboards."""
         curKarma = pd.read_json(self.karma_file_path)
         curKarma['Net score'] = curKarma.apply(lambda x: x['pluses']
                                                - x['minuses'], axis = 1)
