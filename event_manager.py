@@ -43,6 +43,7 @@ def clean_up_message(message):
         message = message[:-2]
     return message
 
+
 def handle_event(event_type, event):
     """
     Routes events from Slack to our KarmaBot instance by type and subtype.
@@ -103,6 +104,18 @@ def listen():
         return handle_event(event_type, event)
 
     return None
+
+
+@app.route('/leaderboard', methods=['POST'])
+def show_leaderboard():
+    """
+    Listens for incoming leaderboard commands and sends them to the bot
+    to formulate a response.
+    """
+    args = request.form.get('text', None)
+    channel_id = request.form.get('channel_id', None)
+    karmaBot.display_leaderboards(args, channel_id)
+    return make_response('Leaderboard displayed.', 200)
 
 
 def _create_challenge_response(challenge: str):
