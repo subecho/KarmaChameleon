@@ -107,7 +107,7 @@ def listen():
 
 
 @app.route('/leaderboard', methods=['POST'])
-def slash_command():
+def show_leaderboard():
     """
     Listens for incoming leaderboard commands and sends them to the bot
     to formulate a response.
