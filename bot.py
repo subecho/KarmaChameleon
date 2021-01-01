@@ -117,7 +117,7 @@ class KarmaBot:
         rows = []
         if request['ok']:
             for item in request['members']:
-                rows.append([item['id'], item['real_name']])
+                rows.append([item['id'], item['name']])
         ids_to_names = pd.DataFrame(rows, columns=['name', 'real_name'])
         ids_to_names['name'] = "<@" + ids_to_names['name'] + ">"
         userKarma = pd.merge(userKarma, ids_to_names, on='name', how='inner')
