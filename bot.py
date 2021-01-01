@@ -103,7 +103,6 @@ class KarmaBot:
         curKarma = pd.read_json(self.karma_file_path)
         curKarma['Net score'] = curKarma.apply(lambda x: x['pluses']
                                                - x['minuses'], axis = 1)
-        curKarma = curKarma.sort_values(by = ['Net score'], ascending = False)
         userKarma = curKarma[curKarma['name'].str.startswith('<@')]
         thingKarma = pd.concat([curKarma,userKarma]).drop_duplicates(keep=False)
 
@@ -126,6 +125,9 @@ class KarmaBot:
         del userKarma['real_name']
 
         userKarma = userKarma.append(oddKarma)
+
+        userKarma = userKarma.sort_values(by = ['Net score'], ascending = False)
+        thingKarma = thingKarma.sort_values(by = ['Net score'], ascending = False)
 
         userKarma = "```" + userKarma.to_markdown(index = False) + "```"
         thingKarma = "```" + thingKarma.to_markdown(index = False) + "```"
