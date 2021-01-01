@@ -128,6 +128,8 @@ class KarmaBot:
 
         userKarma = userKarma.sort_values(by = ['Net score'], ascending = False)
         thingKarma = thingKarma.sort_values(by = ['Net score'], ascending = False)
+        thingKarma = thingKarma.head(10)
+        userKarma = userKarma.head(10)
 
         userKarma = "```" + userKarma.to_markdown(index = False) + "```"
         thingKarma = "```" + thingKarma.to_markdown(index = False) + "```"
