@@ -107,6 +107,26 @@ class KarmaBot:
         userKarma = curKarma[curKarma['name'].str.startswith('<@')]
         thingKarma = pd.concat([curKarma,userKarma]).drop_duplicates(keep=False)
 
+        # Add @here, @everyone, and @channel to the user list. Specific channels
+        # can remain in the thing list.
+        oddKarma = curKarma[curKarma['name'].str.startswith('<!')]
+        thingKarma = pd.concat([thingKarma,oddKarma]).drop_duplicates(keep=False)
+        oddKarma['name'] = oddKarma['name'].map(lambda x: x.lstrip('<!').rstrip('>'))
+
+        # Need to convert users from an ID that @'s them to their name.
+        request = self.client.users_list()
+        rows = []
+        if request['ok']:
+            for item in request['members']:
+                rows.append([item['id'], item['real_name']])
+        ids_to_names = pd.DataFrame(rows, columns=['name', 'real_name'])
+        ids_to_names['name'] = "<@" + ids_to_names['name'] + ">"
+        userKarma = pd.merge(userKarma, ids_to_names, on='name', how='inner')
+        userKarma['name'] = userKarma['real_name']
+        del userKarma['real_name']
+
+        userKarma = userKarma.append(oddKarma)
+
         userKarma = "```" + userKarma.to_markdown(index = False) + "```"
         thingKarma = "```" + thingKarma.to_markdown(index = False) + "```"
 
