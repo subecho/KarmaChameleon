@@ -43,7 +43,7 @@ def clean_up_message(message):
     if '++' in message or '--' in message:
         message = message[:-2]
         if '@' in message or '#' in message:
-            message = message[:1]
+            message = message[1:]
     print( 'WHR DEBUG {}'.format(message) )
     return message
 
