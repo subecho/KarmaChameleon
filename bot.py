@@ -102,6 +102,11 @@ class KarmaBot:
         """Code to print rudimentary user and thing leaderboards."""
         try:
             curKarma = pd.read_json(self.karma_file_path)
+
+            curKarma['Net score'] = curKarma.apply(
+                    lambda x: x['pluses'] - x['minuses'], axis = 1)
+            userKarma = curKarma[curKarma['name'].str.startswith('<@')]
+            thingKarma = pd.concat([curKarma,userKarma]).drop_duplicates(keep=False)
         except ValueError: # Empty file or no file present
             self.client.api_call(
             api_method='chat.postMessage',
@@ -113,11 +118,6 @@ class KarmaBot:
                 'icon_emoji': self.emoji,
             })
             return
-
-        curKarma['Net score'] = curKarma.apply(lambda x: x['pluses']
-                                               - x['minuses'], axis = 1)
-        userKarma = curKarma[curKarma['name'].str.startswith('<@')]
-        thingKarma = pd.concat([curKarma,userKarma]).drop_duplicates(keep=False)
 
         # Add @here, @everyone, and @channel to the user list. Specific channels
         # can remain in the thing list.
