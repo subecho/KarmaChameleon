@@ -33,7 +33,8 @@ def clean_up_message(message):
     """Clean up the passed message.
 
     Format should be (TOKEN(++|--) trailing_garbage).  All we need to do here is get the first
-    token and strip off the last two chars.
+    token and strip off the last two chars.  If the token contains either a '#' or a '@', then that
+    leading character is also stripped.
 
     Returns:
     Cleaned message.
@@ -41,6 +42,8 @@ def clean_up_message(message):
     message = message.split()[0]
     if '++' in message or '--' in message:
         message = message[:-2]
+        if '@' in message or '#' in message:
+            message = message[:1]
     return message
 
 
