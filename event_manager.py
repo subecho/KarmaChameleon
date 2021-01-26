@@ -39,12 +39,11 @@ def clean_up_message(message):
     Returns:
     Cleaned message.
     """
-    message = message.split()[0]
-    if message[:-2] in ['--', '++']:
+     message = message.split()[0]
+    if message[-2:] in ['--', '++']:
         message = message[:-2]
-        if message[0] in ['#', '@']:
-            message = message[1:]
-    print( 'WHR DEBUG {}'.format(message) )
+    if message[0] in ['#', '@']:
+        message = message[1:]
     return message
 
 
