@@ -30,6 +30,23 @@ app = Flask(__name__)
 increment_regex = re.compile(r'^\S+\s?\+\+.*$')
 decrement_regex = re.compile(r'^\S+\s?--.*$')
 
+# create logger with 'spam_application'
+logger = logging.getLogger('kc_event_manager')
+logger.setLevel(logging.DEBUG)
+# create file handler which logs even debug messages
+fh = logging.FileHandler('karmachameleon.log')
+fh.setLevel(logging.DEBUG)
+# create console handler with a higher log level
+ch = logging.StreamHandler()
+ch.setLevel(logging.ERROR)
+# create formatter and add it to the handlers
+formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+fh.setFormatter(formatter)
+ch.setFormatter(formatter)
+# add the handlers to the logger
+logger.addHandler(fh)
+logger.addHandler(ch)
+
 def clean_up_message(message):
     """Clean up the passed message.
 
@@ -70,7 +87,7 @@ def handle_event(event_type, event):
         message = event_detail.get('text', '')
         if (sending_usr and sending_usr in message and
                 (increment_regex.match(message) or decrement_regex.match(message))):
-            logging.debug('Skipping self bump.')
+            logger.debug('Skipping self bump.')
             karmaBot.chastise(('++' in message), channel_id)
             return make_response('Got a self bump', 201)
 
@@ -81,7 +98,7 @@ def handle_event(event_type, event):
             if decrement_regex.match(message):
                 karmaBot.decrement(clean_up_message(message), channel_id)
                 return make_response('Got a decrement message', 201)
-            logging.debug('no regex match')
+            logger.debug('no regex match')
 
     return make_response('Unhandled message event type or no regex match', 200)
 
@@ -97,7 +114,7 @@ def listen():
         return _create_challenge_response(event['challenge'])
 
     if karmaBot.verification_token != event.get('token'):
-        logging.error('Verification Token is Invalid, our token: %s, token provided: %s',
+        logger.error('Verification Token is Invalid, our token: %s, token provided: %s',
                 karmaBot.verification_token, event.get('token'))
         return _create_invalid_verification_token_response(event.get('token'))
 
@@ -132,6 +149,4 @@ def _create_invalid_verification_token_response(bad_token: str):
 
 
 if __name__ == '__main__':
-    logging.basicConfig(filename='karmachameleon.log', filemode='w',
-        format='%(name)s[%(levelname)s]: %(message)s')
     app.run(host='0.0.0.0', debug=True)

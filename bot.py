@@ -49,6 +49,8 @@ class KarmaBot:
 
         self._load_karma_from_json_file()
 
+        self.logger = logging.getLogger('kc_bot')
+
     def echo(self, message: str, channel_id: str):
         """Send a message
 
@@ -210,7 +212,7 @@ class KarmaBot:
     def _load_karma_from_json_file(self):
         karma_file = Path(self.karma_file_path)
         if not karma_file.is_file():
-            logging.debug('No existing karma file found. Will start fresh.')
+            self.logger.debug('No existing karma file found. Will start fresh.')
             return
         with open(self.karma_file_path, 'r') as file_ptr:
             karma_list = json.load(file_ptr, object_hook=KarmaItem.dict_to_karmaitem)
