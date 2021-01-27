@@ -31,7 +31,7 @@ increment_regex = re.compile(r'^\S+\s?\+\+.*$')
 decrement_regex = re.compile(r'^\S+\s?--.*$')
 
 logger = logging.getLogger('kc_event_manager')
-logger.setLevel(logging.DEBUG)
+logger.setLevel(logging.ERROR)
 file_handler = logging.FileHandler('karmachameleon.log')
 file_handler.setLevel(logging.ERROR)
 formatter = logging.Formatter('%(asctime)s %(name)s[%(levelname)s]: %(message)s')
