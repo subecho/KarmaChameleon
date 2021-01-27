@@ -31,7 +31,7 @@ file_handler.setLevel(logging.DEBUG)
 formatter = logging.Formatter('%(asctime)s %(name)s[%(levelname)s-%(funcName)s]: %(message)s')
 file_handler.setFormatter(formatter)
 logger.addHandler(file_handler)
-print logger
+print(logger)
 
 karmaBot = KarmaBot()
 app = Flask(__name__)
