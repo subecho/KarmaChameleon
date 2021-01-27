@@ -40,7 +40,6 @@ class KarmaBot:
         self.emoji = ':lizard:'
         self.verification_token = os.environ.get('VERIFICATION_TOKEN')
         self.logger = logging.getLogger('karma_chameleon.bot')
-        print(self.logger)
 
         # Since our app is only going to be installed in one workspace, we can use the pre-generated
         # OAuth token that Slack gave us when we created our app.
@@ -50,6 +49,7 @@ class KarmaBot:
         self.karma_file_path = os.environ.get('KARMA_FILE_PATH')
 
         self._load_karma_from_json_file()
+        self.logger.info('KarmaBot initialized')
 
     def echo(self, message: str, channel_id: str):
         """Send a message
