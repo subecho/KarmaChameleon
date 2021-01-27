@@ -21,7 +21,6 @@ Provides the routing and management of interactions between Slack and the karma 
 import json
 import re
 import logging
-import logging.config
 from flask import Flask, request, make_response
 from bot import KarmaBot
 
@@ -71,7 +70,7 @@ def handle_event(event_type, event):
         message = event_detail.get('text', '')
         if (sending_usr and sending_usr in message and
                 (increment_regex.match(message) or decrement_regex.match(message))):
-            logger.debug('Skipping self bump.')
+            logging.debug('Skipping self bump.')
             karmaBot.chastise(('++' in message), channel_id)
             return make_response('Got a self bump', 201)
 
@@ -82,7 +81,7 @@ def handle_event(event_type, event):
             if decrement_regex.match(message):
                 karmaBot.decrement(clean_up_message(message), channel_id)
                 return make_response('Got a decrement message', 201)
-            logger.debug('no regex match')
+            logging.debug('no regex match')
 
     return make_response('Unhandled message event type or no regex match', 200)
 
@@ -98,7 +97,7 @@ def listen():
         return _create_challenge_response(event['challenge'])
 
     if karmaBot.verification_token != event.get('token'):
-        logger.error('Verification Token is Invalid, our token: %s, token provided: %s',
+        logging.error('Verification Token is Invalid, our token: %s, token provided: %s',
                 karmaBot.verification_token, event.get('token'))
         return _create_invalid_verification_token_response(event.get('token'))
 
@@ -135,5 +134,4 @@ def _create_invalid_verification_token_response(bad_token: str):
 if __name__ == '__main__':
     logging.basicConfig(filename='karmachameleon.log', filemode='w',
         format='%(name)s[%(levelname)s]: %(message)s')
-    logger = logging.getLogger(__name__)
     app.run(host='0.0.0.0', debug=True)
