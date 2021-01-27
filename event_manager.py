@@ -20,6 +20,7 @@ Provides the routing and management of interactions between Slack and the karma 
 
 import json
 import re
+import os
 import logging
 from logging.handlers import RotatingFileHandler
 from flask import Flask, request, make_response
@@ -27,9 +28,11 @@ from bot import KarmaBot
 
 # The "primary" logger is for the Flask app.  Both event_manager and the KarmaBot have their own
 # loggers.
+if not os.path.exists('logs'):
+    os.makedirs('logs')
 logger = logging.getLogger('karma_chameleon')
 logger.setLevel(logging.DEBUG)
-#file_handler = RotatingFileHandler('karma_chameleon.log', maxBytes=250000000, backupCount=3)
+#file_handler = RotatingFileHandler('logs/karma_chameleon.log', maxBytes=250000000, backupCount=3)
 file_handler = RotatingFileHandler('logs/karma_chameleon.log', maxBytes=2000, backupCount=3)
 
 file_handler.setLevel(logging.DEBUG)
