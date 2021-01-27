@@ -20,6 +20,7 @@ Provides the routing and management of interactions between Slack and the karma 
 
 import json
 import re
+import logging
 from flask import Flask, request, make_response
 from bot import KarmaBot
 
@@ -28,6 +29,8 @@ app = Flask(__name__)
 
 increment_regex = re.compile(r'^\S+\s?\+\+.*$')
 decrement_regex = re.compile(r'^\S+\s?--.*$')
+
+logger = logging.getLogger(__name__)
 
 def clean_up_message(message):
     """Clean up the passed message.
@@ -69,19 +72,18 @@ def handle_event(event_type, event):
         message = event_detail.get('text', '')
         if (sending_usr and sending_usr in message and
                 (increment_regex.match(message) or decrement_regex.match(message))):
-            print('Skipping self bump.')
+            logger.debug('Skipping self bump.')
             karmaBot.chastise(('++' in message), channel_id)
             return make_response('Got a self bump', 201)
 
         if message:
-            print(message)
             if increment_regex.match(message):
                 karmaBot.increment(clean_up_message(message), channel_id)
                 return make_response('Got an increment message', 201)
             if decrement_regex.match(message):
                 karmaBot.decrement(clean_up_message(message), channel_id)
                 return make_response('Got a decrement message', 201)
-            print('no regex match')
+            logger.debug('no regex match')
 
     return make_response('Unhandled message event type or no regex match', 200)
 
@@ -97,8 +99,8 @@ def listen():
         return _create_challenge_response(event['challenge'])
 
     if karmaBot.verification_token != event.get('token'):
-        print('Verification Token is Invalid, our token: %s, token provided: %s' % (
-            karmaBot.verification_token, event.get('token')))
+        logger.error('Verification Token is Invalid, our token: %s, token provided: %s',
+                karmaBot.verification_token, event.get('token'))
         return _create_invalid_verification_token_response(event.get('token'))
 
     if 'event' in event:
@@ -132,4 +134,5 @@ def _create_invalid_verification_token_response(bad_token: str):
 
 
 if __name__ == '__main__':
+    logging.config.fileConfig('karmachameleon.log')
     app.run(host='0.0.0.0', debug=True)

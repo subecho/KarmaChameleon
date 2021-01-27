@@ -19,6 +19,7 @@ Defines the bot that is listening for Slack events and responds to them accordin
 """
 import json
 import os
+import logging
 import pandas as pd
 import tabulate
 
@@ -28,6 +29,8 @@ from slack import WebClient
 
 from karma_item import KarmaItem, KarmaItemEncoder
 from snark import get_positive_message, get_negative_message
+
+logger = logging.getLogger(__name__)
 
 class KarmaBot:
     """Basic Bot object which is able to read incoming messages from Slack and send responses.
@@ -209,7 +212,7 @@ class KarmaBot:
     def _load_karma_from_json_file(self):
         karma_file = Path(self.karma_file_path)
         if not karma_file.is_file():
-            print('No existing file found. Will start fresh.')
+            logger.debug('No existing karma file found. Will start fresh.')
             return
         with open(self.karma_file_path, 'r') as file_ptr:
             karma_list = json.load(file_ptr, object_hook=KarmaItem.dict_to_karmaitem)
