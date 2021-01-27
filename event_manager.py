@@ -24,13 +24,14 @@ import logging
 from flask import Flask, request, make_response
 from bot import KarmaBot
 
-logger = logging.getLogger('kc_event_manager')
+logger = logging.getLogger('karma_chameleon')
 logger.setLevel(logging.DEBUG)
 file_handler = logging.FileHandler('karmachameleon.log')
 file_handler.setLevel(logging.DEBUG)
 formatter = logging.Formatter('%(asctime)s %(name)s[%(levelname)s-%(funcName)s]: %(message)s')
 file_handler.setFormatter(formatter)
 logger.addHandler(file_handler)
+print logger
 
 karmaBot = KarmaBot()
 app = Flask(__name__)

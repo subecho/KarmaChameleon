@@ -39,7 +39,8 @@ class KarmaBot:
         self.username = 'Karma Chameleon'
         self.emoji = ':lizard:'
         self.verification_token = os.environ.get('VERIFICATION_TOKEN')
-        self.logger = logging.getLogger('kc_bot')
+        self.logger = logging.getLogger('karma_chameleon.bot')
+        print logger
 
         # Since our app is only going to be installed in one workspace, we can use the pre-generated
         # OAuth token that Slack gave us when we created our app.
