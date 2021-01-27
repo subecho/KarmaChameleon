@@ -31,6 +31,8 @@ app = Flask(__name__)
 increment_regex = re.compile(r'^\S+\s?\+\+.*$')
 decrement_regex = re.compile(r'^\S+\s?--.*$')
 
+logging.basicConfig(filename='karmachameleon.log', filemode='w',
+        format='%(name)s[%(levelname)s]: %(message)s')
 logger = logging.getLogger(__name__)
 
 def clean_up_message(message):
@@ -135,5 +137,4 @@ def _create_invalid_verification_token_response(bad_token: str):
 
 
 if __name__ == '__main__':
-    logging.config.fileConfig('karmachameleon.log')
     app.run(host='0.0.0.0', debug=True)
