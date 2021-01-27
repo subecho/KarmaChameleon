@@ -140,4 +140,5 @@ def _create_invalid_verification_token_response(bad_token: str):
     return make_response(message, 403, {'X-Slack-No-Retry': 1})
 
 if __name__ == '__main__':
+    logger.info('Starting KC event_manager')
     app.run(host='0.0.0.0', debug=True)
