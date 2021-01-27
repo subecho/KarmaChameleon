@@ -39,6 +39,7 @@ class KarmaBot:
         self.username = 'Karma Chameleon'
         self.emoji = ':lizard:'
         self.verification_token = os.environ.get('VERIFICATION_TOKEN')
+        self.logger = logging.getLogger('kc_bot')
 
         # Since our app is only going to be installed in one workspace, we can use the pre-generated
         # OAuth token that Slack gave us when we created our app.
@@ -48,8 +49,6 @@ class KarmaBot:
         self.karma_file_path = os.environ.get('KARMA_FILE_PATH')
 
         self._load_karma_from_json_file()
-
-        self.logger = logging.getLogger('kc_bot')
 
     def echo(self, message: str, channel_id: str):
         """Send a message
@@ -73,6 +72,7 @@ class KarmaBot:
         self.karma[item].pluses += 1
         self._send_increment_message(item, channel_id)
         self._save_karma_to_json_file()
+        self.logger.info('Incremented karma for %s', item)
 
     def decrement(self, item: str, channel_id: str):
         """Decrement karma for a passed item, and send a corresponding message to the channel inside
@@ -87,6 +87,8 @@ class KarmaBot:
         self.karma[item].minuses += 1
         self._send_decrement_message(item, channel_id)
         self._save_karma_to_json_file()
+        self.logger.info('Decremented karma for %s', item)
+
 
     def chastise(self, inc: bool, channel_id: str):
         """Send a chastise message to users who attempt to increment their own karma, and
@@ -111,6 +113,7 @@ class KarmaBot:
             userKarma = curKarma[curKarma['name'].str.startswith('<@')]
             thingKarma = pd.concat([curKarma,userKarma]).drop_duplicates(keep=False)
         except ValueError: # Empty file or no file present
+            self.logger.exception('Empty karma file or no file present, return.')
             self.client.api_call(
             api_method='chat.postMessage',
             json={
@@ -191,11 +194,13 @@ class KarmaBot:
     def _send_increment_message(self, item: str, channel_id: str):
         message = '%s %s now has %s points.' % (get_positive_message(), item,
                 self.karma[item].total_score)
+        self.logger.info(message)
         self.send_message(message, channel_id)
 
     def _send_decrement_message(self, item: str, channel_id: str):
         message = '%s %s now has %s points.' % (get_negative_message(), item,
                 self.karma[item].total_score)
+        self.logger.info(message)
         self.send_message(message, channel_id)
 
     def _send_chastise_message(self, channel_id: str):
@@ -205,11 +210,13 @@ class KarmaBot:
         self.send_message("Now, now.  Don't be so hard on yourself!", channel_id)
 
     def _save_karma_to_json_file(self):
+        self.logger.info('Saving karma JSON to file %s', self.karma_file_path)
         karma_list = list(self.karma.values())
         with open(self.karma_file_path, 'w') as file_ptr:
             json.dump(karma_list, file_ptr, cls=KarmaItemEncoder)
 
     def _load_karma_from_json_file(self):
+        self.logger.info('Loading karma from file %s', self.karma_file_path)
         karma_file = Path(self.karma_file_path)
         if not karma_file.is_file():
             self.logger.debug('No existing karma file found. Will start fresh.')

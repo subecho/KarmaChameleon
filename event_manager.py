@@ -30,22 +30,13 @@ app = Flask(__name__)
 increment_regex = re.compile(r'^\S+\s?\+\+.*$')
 decrement_regex = re.compile(r'^\S+\s?--.*$')
 
-# create logger with 'spam_application'
 logger = logging.getLogger('kc_event_manager')
 logger.setLevel(logging.DEBUG)
-# create file handler which logs even debug messages
-fh = logging.FileHandler('karmachameleon.log')
-fh.setLevel(logging.DEBUG)
-# create console handler with a higher log level
-ch = logging.StreamHandler()
-ch.setLevel(logging.ERROR)
-# create formatter and add it to the handlers
-formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
-fh.setFormatter(formatter)
-ch.setFormatter(formatter)
-# add the handlers to the logger
-logger.addHandler(fh)
-logger.addHandler(ch)
+file_handler = logging.FileHandler('karmachameleon.log')
+file_handler.setLevel(logging.ERROR)
+formatter = logging.Formatter('%(asctime)s %(name)s[%(levelname)s]: %(message)s')
+file_handler.setFormatter(formatter)
+logger.addHandler(file_handler)
 
 def clean_up_message(message):
     """Clean up the passed message.
@@ -64,7 +55,6 @@ def clean_up_message(message):
         message = message[1:]
     return message
 
-
 def handle_event(event_type, event):
     """
     Routes events from Slack to our KarmaBot instance by type and subtype.
@@ -78,10 +68,13 @@ def handle_event(event_type, event):
     event handler for the given event type.
     """
     event_detail = event['event']
+    event_subtype = event_detail.get('subtype')
     channel_id = event_detail['channel']
 
+    logger.info('Processing message with event type %s and subtype %s', event_type, event_subtype)
+
     # Ensure that the message we got is not from the bot itself
-    if event_type == 'message' and event_detail.get('subtype') != 'bot_message':
+    if event_type == 'message' and event_subtype != 'bot_message':
         # Prevent users from ++ or -- themselves.
         sending_usr = event_detail.get('user')
         message = event_detail.get('text', '')
@@ -100,8 +93,8 @@ def handle_event(event_type, event):
                 return make_response('Got a decrement message', 201)
             logger.debug('no regex match')
 
+    logger.debug('Unhandled message event type/subtype or no regex match')
     return make_response('Unhandled message event type or no regex match', 200)
-
 
 @app.route('/karma', methods=['GET', 'POST'])
 def listen():
@@ -110,6 +103,7 @@ def listen():
     """
     event = json.loads(request.data)
 
+    logger.info('Handling event %s', event)
     if 'challenge' in event:
         return _create_challenge_response(event['challenge'])
 
@@ -124,7 +118,6 @@ def listen():
 
     return None
 
-
 @app.route('/leaderboard', methods=['POST'])
 def show_leaderboard():
     """
@@ -134,19 +127,17 @@ def show_leaderboard():
     args = request.form.get('text', None)
     channel_id = request.form.get('channel_id', None)
     karmaBot.display_leaderboards(args, channel_id)
+    logger.info('Handling /leaderboard command')
     return make_response('Leaderboard displayed.', 200)
-
 
 def _create_challenge_response(challenge: str):
     return make_response(challenge, 200, {'content_type': 'application/json'})
-
 
 def _create_invalid_verification_token_response(bad_token: str):
     message = 'Invalid Slack verification token: %s' % bad_token
     # Adding 'X-Slack-No-Retry': 1 to our response header turns off Slack's auto retries while we
     # develop.
     return make_response(message, 403, {'X-Slack-No-Retry': 1})
-
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', debug=True)
