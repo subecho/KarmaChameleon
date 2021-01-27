@@ -21,6 +21,7 @@ Provides the routing and management of interactions between Slack and the karma 
 import json
 import re
 import logging
+from logging.handlers import RotatingFileHandler
 from flask import Flask, request, make_response
 from bot import KarmaBot
 
@@ -28,7 +29,9 @@ from bot import KarmaBot
 # loggers.
 logger = logging.getLogger('karma_chameleon')
 logger.setLevel(logging.DEBUG)
-file_handler = logging.FileHandler('karma_chameleon.log')
+#file_handler = RotatingFileHandler('karma_chameleon.log', maxBytes=250000000, backupCount=3)
+file_handler = RotatingFileHandler('karma_chameleon.log', maxBytes=2000, backupCount=3)
+
 file_handler.setLevel(logging.DEBUG)
 formatter = logging.Formatter('%(asctime)s %(name)s %(levelname)s[%(funcName)s]: %(message)s')
 file_handler.setFormatter(formatter)
@@ -76,7 +79,8 @@ def handle_event(event_type, event):
     event_subtype = event_detail.get('subtype')
     channel_id = event_detail['channel']
 
-    em_logger.info('Processing message with event type %s and subtype %s', event_type, event_subtype)
+    em_logger.info('Processing message with event type %s and subtype %s',
+            event_type, event_subtype)
 
     # Ensure that the message we got is not from the bot itself
     if event_type == 'message' and event_subtype != 'bot_message':
@@ -145,5 +149,4 @@ def _create_invalid_verification_token_response(bad_token: str):
     return make_response(message, 403, {'X-Slack-No-Retry': 1})
 
 if __name__ == '__main__':
-    logger.info('Starting KC event_manager')
     app.run(host='0.0.0.0', debug=True)
