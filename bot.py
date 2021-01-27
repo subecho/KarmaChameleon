@@ -167,7 +167,6 @@ class KarmaBot:
                 'icon_emoji': self.emoji,
             })
 
-
     def send_message(self, message: str, channel_id: str):
         """Send a message to the passed Slack channel.
 
