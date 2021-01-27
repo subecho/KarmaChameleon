@@ -30,7 +30,7 @@ from bot import KarmaBot
 logger = logging.getLogger('karma_chameleon')
 logger.setLevel(logging.DEBUG)
 #file_handler = RotatingFileHandler('karma_chameleon.log', maxBytes=250000000, backupCount=3)
-file_handler = RotatingFileHandler('karma_chameleon.log', maxBytes=2000, backupCount=3)
+file_handler = RotatingFileHandler('logs/karma_chameleon.log', maxBytes=2000, backupCount=3)
 
 file_handler.setLevel(logging.DEBUG)
 formatter = logging.Formatter('%(asctime)s %(name)s %(levelname)s[%(funcName)s]: %(message)s')
