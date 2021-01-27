@@ -24,12 +24,6 @@ import logging
 from flask import Flask, request, make_response
 from bot import KarmaBot
 
-karmaBot = KarmaBot()
-app = Flask(__name__)
-
-increment_regex = re.compile(r'^\S+\s?\+\+.*$')
-decrement_regex = re.compile(r'^\S+\s?--.*$')
-
 logger = logging.getLogger('kc_event_manager')
 logger.setLevel(logging.DEBUG)
 file_handler = logging.FileHandler('karmachameleon.log')
@@ -37,6 +31,12 @@ file_handler.setLevel(logging.DEBUG)
 formatter = logging.Formatter('%(asctime)s %(name)s[%(levelname)s-%(funcName)s]: %(message)s')
 file_handler.setFormatter(formatter)
 logger.addHandler(file_handler)
+
+karmaBot = KarmaBot()
+app = Flask(__name__)
+
+increment_regex = re.compile(r'^\S+\s?\+\+.*$')
+decrement_regex = re.compile(r'^\S+\s?--.*$')
 
 def clean_up_message(message):
     """Clean up the passed message.
