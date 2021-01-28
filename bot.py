@@ -19,11 +19,9 @@ Defines the bot that is listening for Slack events and responds to them accordin
 """
 import json
 import os
-import pandas as pd
-import tabulate
-
 from pathlib import Path
 
+import pandas as pd
 from slack import WebClient
 
 from karma_item import KarmaItem, KarmaItemEncoder
@@ -98,15 +96,15 @@ class KarmaBot:
         else:
             self._send_encouragement_message(channel_id)
 
-    def display_leaderboards(self, args: str, channel_id: str):
+    def display_leaderboards(self, channel_id: str):
         """Code to print rudimentary user and thing leaderboards."""
         try:
-            curKarma = pd.read_json(self.karma_file_path)
+            cur_karma = pd.read_json(self.karma_file_path)
 
-            curKarma['Net score'] = curKarma.apply(
+            cur_karma['Net score'] = cur_karma.apply(
                     lambda x: x['pluses'] - x['minuses'], axis = 1)
-            userKarma = curKarma[curKarma['name'].str.startswith('<@')]
-            thingKarma = pd.concat([curKarma,userKarma]).drop_duplicates(keep=False)
+            usr_karma = cur_karma[cur_karma['name'].str.startswith('<@')]
+            thing_karma = pd.concat([cur_karma,usr_karma]).drop_duplicates(keep=False)
         except ValueError: # Empty file or no file present
             self.client.api_call(
             api_method='chat.postMessage',
@@ -121,9 +119,9 @@ class KarmaBot:
 
         # Add @here, @everyone, and @channel to the user list. Specific channels
         # can remain in the thing list.
-        oddKarma = curKarma[curKarma['name'].str.startswith('<!')]
-        thingKarma = pd.concat([thingKarma,oddKarma]).drop_duplicates(keep=False)
-        oddKarma['name'] = oddKarma['name'].map(lambda x: x.lstrip('<!').rstrip('>'))
+        odd_karma = cur_karma[cur_karma['name'].str.startswith('<!')]
+        thing_karma = pd.concat([thing_karma,odd_karma]).drop_duplicates(keep=False)
+        odd_karma['name'] = odd_karma['name'].map(lambda x: x.lstrip('<!').rstrip('>'))
 
         # Need to convert users from an ID that @'s them to their name.
         request = self.client.users_list()
@@ -133,26 +131,26 @@ class KarmaBot:
                 rows.append([item['id'], item['name']])
         ids_to_names = pd.DataFrame(rows, columns=['name', 'real_name'])
         ids_to_names['name'] = "<@" + ids_to_names['name'] + ">"
-        userKarma = pd.merge(userKarma, ids_to_names, on='name', how='inner')
-        userKarma['name'] = userKarma['real_name']
-        del userKarma['real_name']
+        usr_karma = pd.merge(usr_karma, ids_to_names, on='name', how='inner')
+        usr_karma['name'] = usr_karma['real_name']
+        del usr_karma['real_name']
 
-        userKarma = userKarma.append(oddKarma)
+        usr_karma = usr_karma.append(odd_karma)
 
-        userKarma = userKarma.sort_values(by = ['Net score'], ascending = False)
-        thingKarma = thingKarma.sort_values(by = ['Net score'], ascending = False)
-        thingKarma = thingKarma.head(10)
-        userKarma = userKarma.head(10)
+        usr_karma = usr_karma.sort_values(by = ['Net score'], ascending = False)
+        thing_karma = thing_karma.sort_values(by = ['Net score'], ascending = False)
+        thing_karma = thing_karma.head(10)
+        usr_karma = usr_karma.head(10)
 
-        userKarma = "```" + userKarma.to_markdown(index = False) + "```"
-        thingKarma = "```" + thingKarma.to_markdown(index = False) + "```"
+        usr_karma = "```" + usr_karma.to_markdown(index = False) + "```"
+        thing_karma = "```" + thing_karma.to_markdown(index = False) + "```"
 
         self.client.api_call(
             api_method='chat.postMessage',
             json={
                 'token': self.oauth_token,
                 'channel': channel_id,
-                'text': "User leaderboard:\n" + userKarma,
+                'text': "User leaderboard:\n" + usr_karma,
                 'username': self.username,
                 'icon_emoji': self.emoji,
             })
@@ -162,7 +160,7 @@ class KarmaBot:
             json={
                 'token': self.oauth_token,
                 'channel': channel_id,
-                'text': "Thing leaderboard:\n" + thingKarma,
+                'text': "Thing leaderboard:\n" + thing_karma,
                 'username': self.username,
                 'icon_emoji': self.emoji,
             })
