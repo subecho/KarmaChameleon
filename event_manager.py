@@ -114,9 +114,8 @@ def show_leaderboard():
     Listens for incoming leaderboard commands and sends them to the bot
     to formulate a response.
     """
-    args = request.form.get('text', None)
     channel_id = request.form.get('channel_id', None)
-    karmaBot.display_leaderboards(args, channel_id)
+    karmaBot.display_leaderboards(channel_id)
     return make_response('Leaderboard displayed.', 200)
 
 
