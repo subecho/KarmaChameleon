@@ -81,7 +81,7 @@ def handle_event(event_type, event):
     event_subtype = event_detail.get('subtype')
     channel_id = event_detail['channel']
 
-    em_logger.info('Processing message with event type %s and subtype %s',
+    em_logger.debug('Processing message with event type %s and subtype %s',
             event_type, event_subtype)
 
     # Ensure that the message we got is not from the bot itself
@@ -138,7 +138,7 @@ def show_leaderboard():
     args = request.form.get('text', None)
     channel_id = request.form.get('channel_id', None)
     karmaBot.display_leaderboards(args, channel_id)
-    logger.info('Handling /leaderboard command')
+    logger.debug('Handling /leaderboard command')
     return make_response('Leaderboard displayed.', 200)
 
 def _create_challenge_response(challenge: str):

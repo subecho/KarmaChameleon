@@ -195,13 +195,13 @@ class KarmaBot:
     def _send_increment_message(self, item: str, channel_id: str):
         message = '%s %s now has %s points.' % (get_positive_message(), item,
                 self.karma[item].total_score)
-        self.logger.info(message)
+        self.logger.debug(message)
         self.send_message(message, channel_id)
 
     def _send_decrement_message(self, item: str, channel_id: str):
         message = '%s %s now has %s points.' % (get_negative_message(), item,
                 self.karma[item].total_score)
-        self.logger.info(message)
+        self.logger.debug(message)
         self.send_message(message, channel_id)
 
     def _send_chastise_message(self, channel_id: str):
@@ -211,7 +211,7 @@ class KarmaBot:
         self.send_message("Now, now.  Don't be so hard on yourself!", channel_id)
 
     def _save_karma_to_json_file(self):
-        self.logger.info('Saving karma JSON to file %s', self.karma_file_path)
+        self.logger.debug('Saving karma JSON to file %s', self.karma_file_path)
         karma_list = list(self.karma.values())
         with open(self.karma_file_path, 'w') as file_ptr:
             json.dump(karma_list, file_ptr, cls=KarmaItemEncoder)
