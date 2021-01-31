@@ -102,9 +102,10 @@ def handle_event(event_type, event):
             if decrement_regex.match(message):
                 karmaBot.decrement(clean_up_message(message), channel_id)
                 return make_response('Got a decrement message', 201)
-            em_logger.debug('no regex match')
+            em_logger.debug("message does not pass regex check for karma tokens")
+    else:
+        em_logger.debug("Received unhandled event type %s, %s", event_type, event_subtype)
 
-    em_logger.debug('Unhandled message event type/subtype or no regex match')
     return make_response('Unhandled message event type or no regex match', 200)
 
 @app.route('/karma', methods=['GET', 'POST'])
@@ -114,7 +115,7 @@ def listen():
     """
     event = json.loads(request.data)
 
-    logger.info('Handling event %s', event)
+    logger.debug('Handling event %s, %s', event{"type"}, event{"event"}.get("subtype"))
     if 'challenge' in event:
         return _create_challenge_response(event['challenge'])
 

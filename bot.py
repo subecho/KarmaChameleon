@@ -49,7 +49,7 @@ class KarmaBot:
         self.karma_file_path = os.environ.get('KARMA_FILE_PATH')
 
         self._load_karma_from_json_file()
-        self.logger.info('KarmaBot initialized')
+        self.logger.debug('KarmaBot initialized')
 
     def echo(self, message: str, channel_id: str):
         """Send a message
@@ -73,7 +73,7 @@ class KarmaBot:
         self.karma[item].pluses += 1
         self._send_increment_message(item, channel_id)
         self._save_karma_to_json_file()
-        self.logger.info('Incremented karma for %s', item)
+        self.logger.debug('Incremented karma for %s', item)
 
     def decrement(self, item: str, channel_id: str):
         """Decrement karma for a passed item, and send a corresponding message to the channel inside
@@ -88,7 +88,7 @@ class KarmaBot:
         self.karma[item].minuses += 1
         self._send_decrement_message(item, channel_id)
         self._save_karma_to_json_file()
-        self.logger.info('Decremented karma for %s', item)
+        self.logger.debug('Decremented karma for %s', item)
 
 
     def chastise(self, inc: bool, channel_id: str):
@@ -217,7 +217,7 @@ class KarmaBot:
             json.dump(karma_list, file_ptr, cls=KarmaItemEncoder)
 
     def _load_karma_from_json_file(self):
-        self.logger.info('Loading karma from file %s', self.karma_file_path)
+        self.logger.debug('Loading karma from file %s', self.karma_file_path)
         karma_file = Path(self.karma_file_path)
         if not karma_file.is_file():
             self.logger.debug('No existing karma file found. Will start fresh.')
