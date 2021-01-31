@@ -20,8 +20,34 @@ Provides the routing and management of interactions between Slack and the karma 
 
 import json
 import re
+import os
+import logging
+from logging.handlers import RotatingFileHandler
 from flask import Flask, request, make_response
 from bot import KarmaBot
+
+# There is only one logger, with three different sub-loggers.  All loggers use the same file
+# destination, and line format.  The logger with UID "karma_chameleon" is used to log events for the
+# main app, i.e. the Flask app.  karma_chameleon.event_manager logs events and debug info pertaining
+# to the event_manager.py methods.  karma_chameleon.bot logs events and debug info pertaining to the
+# methods of the KarmaBot class.
+#
+# If the logs dir does not exit, make it.
+if not os.path.exists('logs'):
+    os.makedirs('logs')
+
+# Create the "main" logger.  This logger has the file destination and line format that is inherited
+# by all sub-loggers.
+logger = logging.getLogger('karma_chameleon')
+logger.setLevel(logging.DEBUG)
+file_handler = RotatingFileHandler('logs/karma_chameleon.log', maxBytes=10_000_000, backupCount=3)
+file_handler.setLevel(logging.DEBUG)
+formatter = logging.Formatter('%(asctime)s %(name)s %(levelname)s[%(funcName)s]: %(message)s')
+file_handler.setFormatter(formatter)
+logger.addHandler(file_handler)
+
+# Create a sub-logger for the event_manager methods.
+em_logger = logging.getLogger('karma_chameleon.event_manager')
 
 karmaBot = KarmaBot()
 app = Flask(__name__)
@@ -47,7 +73,6 @@ def clean_up_message(message):
         message = message[1:]
     return message
 
-
 def handle_event(event_type, event):
     """
     Routes events from Slack to our KarmaBot instance by type and subtype.
@@ -60,8 +85,13 @@ def handle_event(event_type, event):
     A response object with 200 OK if there was a valid event handler or 500 if there was no valid
     event handler for the given event type.
     """
+    event_detail = event['event']
+    event_subtype = event_detail.get("subtype")
     event_detail = event["event"]
     channel_id = event_detail["channel"]
+
+    em_logger.debug('Processing message with event type %s and subtype %s',
+            event_type, event_subtype)
 
     # Ensure that the message we got is not from the bot itself
     if event_type == "message" and event_detail.get("subtype") != "bot_message":
@@ -73,22 +103,20 @@ def handle_event(event_type, event):
             and sending_usr in message
             and (increment_regex.match(message) or decrement_regex.match(message))
         ):
-            print("Skipping self bump.")
+            em_logger.debug("Skipping self bump.")
             karmaBot.chastise(("++" in message), channel_id)
             return make_response("Got a self bump", 201)
-
+          
         if message:
-            print(message)
             if increment_regex.match(message):
                 karmaBot.increment(clean_up_message(message), channel_id)
                 return make_response("Got an increment message", 201)
             if decrement_regex.match(message):
                 karmaBot.decrement(clean_up_message(message), channel_id)
                 return make_response("Got a decrement message", 201)
-            print("no regex match")
-
+            em_logger.debug("message does not pass regex check for karma tokens")
+            
     return make_response("Unhandled message event type or no regex match", 200)
-
 
 @app.route("/karma", methods=["GET", "POST"])
 def listen():
@@ -97,13 +125,14 @@ def listen():
     """
     event = json.loads(request.data)
 
+    logger.debug("Handling event %s, %s", event{"type"}, event{"event"}.get("subtype"))
     if "challenge" in event:
         return _create_challenge_response(event["challenge"])
 
     if karmaBot.verification_token != event.get("token"):
-        print(
-            "Verification Token is Invalid, our token: %s, token provided: %s"
-            % (karmaBot.verification_token, event.get("token"))
+        logger.error(
+            "Verification Token is Invalid, our token: %s, token provided: %s",
+            (karmaBot.verification_token, event.get("token"))
         )
         return _create_invalid_verification_token_response(event.get("token"))
 
@@ -113,7 +142,6 @@ def listen():
 
     return None
 
-
 @app.route("/leaderboard", methods=["POST"])
 def show_leaderboard():
     """
@@ -122,19 +150,17 @@ def show_leaderboard():
     """
     channel_id = request.form.get("channel_id", None)
     karmaBot.display_leaderboards(channel_id)
+    logger.debug('Handling /leaderboard command')
     return make_response("Leaderboard displayed.", 200)
-
 
 def _create_challenge_response(challenge: str):
     return make_response(challenge, 200, {"content_type": "application/json"})
-
 
 def _create_invalid_verification_token_response(bad_token: str):
     message = "Invalid Slack verification token: %s" % bad_token
     # Adding 'X-Slack-No-Retry': 1 to our response header turns off Slack's auto retries while we
     # develop.
     return make_response(message, 403, {"X-Slack-No-Retry": 1})
-
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", debug=True)
