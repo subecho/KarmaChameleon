@@ -32,18 +32,19 @@ class KarmaBot:
     """Basic Bot object which is able to read incoming messages from Slack and send responses.
     The bot is also able to read karma from the json save-file, and make changes to the same.
     """
+
     def __init__(self):
         super().__init__()
-        self.username = 'Karma Chameleon'
-        self.emoji = ':lizard:'
-        self.verification_token = os.environ.get('VERIFICATION_TOKEN')
+        self.username = "Karma Chameleon"
+        self.emoji = ":lizard:"
+        self.verification_token = os.environ.get("VERIFICATION_TOKEN")
 
         # Since our app is only going to be installed in one workspace, we can use the pre-generated
         # OAuth token that Slack gave us when we created our app.
-        self.oauth_token = os.environ.get('BOT_OAUTH_TOKEN')
+        self.oauth_token = os.environ.get("BOT_OAUTH_TOKEN")
         self.client = WebClient(self.oauth_token)
         self.karma = {}
-        self.karma_file_path = os.environ.get('KARMA_FILE_PATH')
+        self.karma_file_path = os.environ.get("KARMA_FILE_PATH")
 
         self._load_karma_from_json_file()
 
@@ -102,69 +103,73 @@ class KarmaBot:
         try:
             cur_karma = pd.read_json(self.karma_file_path)
 
-            cur_karma['Net score'] = cur_karma.apply(
-                    lambda x: x['pluses'] - x['minuses'], axis = 1)
-            usr_karma = cur_karma[cur_karma['name'].str.startswith('<@')]
-            thing_karma = pd.concat([cur_karma,usr_karma]).drop_duplicates(keep=False)
-        except ValueError: # Empty file or no file present
+            cur_karma["Net score"] = cur_karma.apply(
+                lambda x: x["pluses"] - x["minuses"], axis=1
+            )
+            usr_karma = cur_karma[cur_karma["name"].str.startswith("<@")]
+            thing_karma = pd.concat([cur_karma, usr_karma]).drop_duplicates(keep=False)
+        except ValueError:  # Empty file or no file present
             self.client.api_call(
-            api_method='chat.postMessage',
-            json={
-                'token': self.oauth_token,
-                'channel': channel_id,
-                'text': "No karma yet!",
-                'username': self.username,
-                'icon_emoji': self.emoji,
-            })
+                api_method="chat.postMessage",
+                json={
+                    "token": self.oauth_token,
+                    "channel": channel_id,
+                    "text": "No karma yet!",
+                    "username": self.username,
+                    "icon_emoji": self.emoji,
+                },
+            )
             return
 
         # Add @here, @everyone, and @channel to the user list. Specific channels
         # can remain in the thing list.
-        odd_karma = cur_karma[cur_karma['name'].str.startswith('<!')]
-        thing_karma = pd.concat([thing_karma,odd_karma]).drop_duplicates(keep=False)
-        odd_karma['name'] = odd_karma['name'].map(lambda x: x.lstrip('<!').rstrip('>'))
+        odd_karma = cur_karma[cur_karma["name"].str.startswith("<!")]
+        thing_karma = pd.concat([thing_karma, odd_karma]).drop_duplicates(keep=False)
+        odd_karma["name"] = odd_karma["name"].map(lambda x: x.lstrip("<!").rstrip(">"))
 
         # Need to convert users from an ID that @'s them to their name.
         request = self.client.users_list()
         rows = []
-        if request['ok']:
-            for item in request['members']:
-                rows.append([item['id'], item['name']])
-        ids_to_names = pd.DataFrame(rows, columns=['name', 'real_name'])
-        ids_to_names['name'] = "<@" + ids_to_names['name'] + ">"
-        usr_karma = pd.merge(usr_karma, ids_to_names, on='name', how='inner')
-        usr_karma['name'] = usr_karma['real_name']
-        del usr_karma['real_name']
+        if request["ok"]:
+            for item in request["members"]:
+                rows.append([item["id"], item["name"]])
+        ids_to_names = pd.DataFrame(rows, columns=["name", "real_name"])
+        ids_to_names["name"] = "<@" + ids_to_names["name"] + ">"
+        usr_karma = pd.merge(usr_karma, ids_to_names, on="name", how="inner")
+        usr_karma["name"] = usr_karma["real_name"]
+        del usr_karma["real_name"]
 
         usr_karma = usr_karma.append(odd_karma)
 
-        usr_karma = usr_karma.sort_values(by = ['Net score'], ascending = False)
-        thing_karma = thing_karma.sort_values(by = ['Net score'], ascending = False)
+        usr_karma = usr_karma.sort_values(by=["Net score"], ascending=False)
+        thing_karma = thing_karma.sort_values(by=["Net score"], ascending=False)
         thing_karma = thing_karma.head(10)
         usr_karma = usr_karma.head(10)
 
-        usr_karma = "```" + usr_karma.to_markdown(index = False) + "```"
-        thing_karma = "```" + thing_karma.to_markdown(index = False) + "```"
+        usr_karma = "```" + usr_karma.to_markdown(index=False) + "```"
+        thing_karma = "```" + thing_karma.to_markdown(index=False) + "```"
 
         self.client.api_call(
-            api_method='chat.postMessage',
+            api_method="chat.postMessage",
             json={
-                'token': self.oauth_token,
-                'channel': channel_id,
-                'text': "User leaderboard:\n" + usr_karma,
-                'username': self.username,
-                'icon_emoji': self.emoji,
-            })
+                "token": self.oauth_token,
+                "channel": channel_id,
+                "text": "User leaderboard:\n" + usr_karma,
+                "username": self.username,
+                "icon_emoji": self.emoji,
+            },
+        )
 
         self.client.api_call(
-            api_method='chat.postMessage',
+            api_method="chat.postMessage",
             json={
-                'token': self.oauth_token,
-                'channel': channel_id,
-                'text': "Thing leaderboard:\n" + thing_karma,
-                'username': self.username,
-                'icon_emoji': self.emoji,
-            })
+                "token": self.oauth_token,
+                "channel": channel_id,
+                "text": "Thing leaderboard:\n" + thing_karma,
+                "username": self.username,
+                "icon_emoji": self.emoji,
+            },
+        )
 
     def send_message(self, message: str, channel_id: str):
         """Send a message to the passed Slack channel.
@@ -174,44 +179,51 @@ class KarmaBot:
         channel_id -- target channel for the message
         """
         self.client.api_call(
-            api_method='chat.postMessage',
+            api_method="chat.postMessage",
             json={
-                    'token': self.oauth_token,
-                    'channel': channel_id,
-                    'text': message,
-                    'username': self.username,
-                    'icon_emoji': self.emoji,
-            })
+                "token": self.oauth_token,
+                "channel": channel_id,
+                "text": message,
+                "username": self.username,
+                "icon_emoji": self.emoji,
+            },
+        )
 
     def _send_increment_message(self, item: str, channel_id: str):
-        message = '%s %s now has %s points.' % (get_positive_message(), item,
-                self.karma[item].total_score)
+        message = "%s %s now has %s points." % (
+            get_positive_message(),
+            item,
+            self.karma[item].total_score,
+        )
         self.send_message(message, channel_id)
 
     def _send_decrement_message(self, item: str, channel_id: str):
-        message = '%s %s now has %s points.' % (get_negative_message(), item,
-                self.karma[item].total_score)
+        message = "%s %s now has %s points." % (
+            get_negative_message(),
+            item,
+            self.karma[item].total_score,
+        )
         self.send_message(message, channel_id)
 
     def _send_chastise_message(self, channel_id: str):
-        self.send_message('Ahem, no self-bumping...', channel_id)
+        self.send_message("Ahem, no self-bumping...", channel_id)
 
     def _send_encouragement_message(self, channel_id: str):
         self.send_message("Now, now.  Don't be so hard on yourself!", channel_id)
 
     def _save_karma_to_json_file(self):
         karma_list = list(self.karma.values())
-        with open(self.karma_file_path, 'w') as file_ptr:
+        with open(self.karma_file_path, "w") as file_ptr:
             json.dump(karma_list, file_ptr, cls=KarmaItemEncoder)
 
     def _load_karma_from_json_file(self):
         karma_file = Path(self.karma_file_path)
         if not karma_file.is_file():
-            print('No existing file found. Will start fresh.')
-            with open(self.karma_file_path, 'w') as file_ptr:
-                file_ptr.write('[]')
+            print("No existing file found. Will start fresh.")
+            with open(self.karma_file_path, "w") as file_ptr:
+                file_ptr.write("[]")
             return
-        with open(self.karma_file_path, 'r') as file_ptr:
+        with open(self.karma_file_path, "r") as file_ptr:
             karma_list = json.load(file_ptr, object_hook=KarmaItem.dict_to_karmaitem)
         for item in karma_list:
             self.karma[item.name] = item
