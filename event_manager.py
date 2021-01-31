@@ -52,8 +52,9 @@ em_logger = logging.getLogger('karma_chameleon.event_manager')
 karmaBot = KarmaBot()
 app = Flask(__name__)
 
-increment_regex = re.compile(r'^\S+\s?\+\+.*$')
-decrement_regex = re.compile(r'^\S+\s?--.*$')
+increment_regex = re.compile(r"^\S+\s?\+\+.*$")
+decrement_regex = re.compile(r"^\S+\s?--.*$")
+
 
 def clean_up_message(message):
     """Clean up the passed message.
@@ -66,9 +67,9 @@ def clean_up_message(message):
     Cleaned message.
     """
     message = message.split()[0]
-    if message[-2:] in ['--', '++']:
+    if message[-2:] in ["--", "++"]:
         message = message[:-2]
-    if message[0] in ['#', '@']:
+    if message[0] in ["#", "@"]:
         message = message[1:]
     return message
 
@@ -85,78 +86,81 @@ def handle_event(event_type, event):
     event handler for the given event type.
     """
     event_detail = event['event']
-    event_subtype = event_detail.get('subtype')
-    channel_id = event_detail['channel']
+    event_subtype = event_detail.get("subtype")
+    event_detail = event["event"]
+    channel_id = event_detail["channel"]
 
     em_logger.debug('Processing message with event type %s and subtype %s',
             event_type, event_subtype)
 
     # Ensure that the message we got is not from the bot itself
-    if event_type == 'message' and event_subtype != 'bot_message':
+    if event_type == "message" and event_detail.get("subtype") != "bot_message":
         # Prevent users from ++ or -- themselves.
-        sending_usr = event_detail.get('user')
-        message = event_detail.get('text', '')
-        if (sending_usr and sending_usr in message and
-                (increment_regex.match(message) or decrement_regex.match(message))):
-            em_logger.debug('Skipping self bump.')
-            karmaBot.chastise(('++' in message), channel_id)
-            return make_response('Got a self bump', 201)
-
+        sending_usr = event_detail.get("user")
+        message = event_detail.get("text", "")
+        if (
+            sending_usr
+            and sending_usr in message
+            and (increment_regex.match(message) or decrement_regex.match(message))
+        ):
+            em_logger.debug("Skipping self bump.")
+            karmaBot.chastise(("++" in message), channel_id)
+            return make_response("Got a self bump", 201)
+          
         if message:
             if increment_regex.match(message):
                 karmaBot.increment(clean_up_message(message), channel_id)
-                return make_response('Got an increment message', 201)
+                return make_response("Got an increment message", 201)
             if decrement_regex.match(message):
                 karmaBot.decrement(clean_up_message(message), channel_id)
-                return make_response('Got a decrement message', 201)
+                return make_response("Got a decrement message", 201)
             em_logger.debug("message does not pass regex check for karma tokens")
-    else:
-        em_logger.debug("Received unhandled event type %s, %s", event_type, event_subtype)
+            
+    return make_response("Unhandled message event type or no regex match", 200)
 
-    return make_response('Unhandled message event type or no regex match', 200)
-
-@app.route('/karma', methods=['GET', 'POST'])
+@app.route("/karma", methods=["GET", "POST"])
 def listen():
     """
     Listens for incoming events and routes them to the proper handler in the bot
     """
     event = json.loads(request.data)
 
-    logger.debug('Handling event %s, %s', event{"type"}, event{"event"}.get("subtype"))
-    if 'challenge' in event:
-        return _create_challenge_response(event['challenge'])
+    logger.debug("Handling event %s, %s", event{"type"}, event{"event"}.get("subtype"))
+    if "challenge" in event:
+        return _create_challenge_response(event["challenge"])
 
-    if karmaBot.verification_token != event.get('token'):
-        logger.error('Verification Token is Invalid, our token: %s, token provided: %s',
-                karmaBot.verification_token, event.get('token'))
-        return _create_invalid_verification_token_response(event.get('token'))
+    if karmaBot.verification_token != event.get("token"):
+        logger.error(
+            "Verification Token is Invalid, our token: %s, token provided: %s",
+            (karmaBot.verification_token, event.get("token"))
+        )
+        return _create_invalid_verification_token_response(event.get("token"))
 
-    if 'event' in event:
-        event_type = event['event']['type']
+    if "event" in event:
+        event_type = event["event"]["type"]
         return handle_event(event_type, event)
 
     return None
 
-@app.route('/leaderboard', methods=['POST'])
+@app.route("/leaderboard", methods=["POST"])
 def show_leaderboard():
     """
     Listens for incoming leaderboard commands and sends them to the bot
     to formulate a response.
     """
-    args = request.form.get('text', None)
-    channel_id = request.form.get('channel_id', None)
-    karmaBot.display_leaderboards(args, channel_id)
+    channel_id = request.form.get("channel_id", None)
+    karmaBot.display_leaderboards(channel_id)
     logger.debug('Handling /leaderboard command')
-    return make_response('Leaderboard displayed.', 200)
+    return make_response("Leaderboard displayed.", 200)
 
 def _create_challenge_response(challenge: str):
-    return make_response(challenge, 200, {'content_type': 'application/json'})
+    return make_response(challenge, 200, {"content_type": "application/json"})
 
 def _create_invalid_verification_token_response(bad_token: str):
-    message = 'Invalid Slack verification token: %s' % bad_token
+    message = "Invalid Slack verification token: %s" % bad_token
     # Adding 'X-Slack-No-Retry': 1 to our response header turns off Slack's auto retries while we
     # develop.
-    return make_response(message, 403, {'X-Slack-No-Retry': 1})
+    return make_response(message, 403, {"X-Slack-No-Retry": 1})
 
-if __name__ == '__main__':
-    app.run(host='0.0.0.0', debug=True)
+if __name__ == "__main__":
+    app.run(host="0.0.0.0", debug=True)

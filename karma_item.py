@@ -20,8 +20,10 @@ and minuses.
 """
 import json
 
-class KarmaItem():
+
+class KarmaItem:
     """Object representation of a thing, and the karma associated with that thing."""
+
     def __init__(self, name: str, pluses: int = 0, minuses: int = 0):
         super().__init__()
         self.name = name
@@ -29,24 +31,25 @@ class KarmaItem():
         self.minuses = minuses
 
     def __repr__(self):
-        return self.__class__.__name__ + '({!r}, {!r}, {!r})'.format(
-                self.name, self.pluses, self.minuses)
+        return self.__class__.__name__ + "({!r}, {!r}, {!r})".format(
+            self.name, self.pluses, self.minuses
+        )
 
     def __str__(self):
         if self.pluses == 1:
-            pluses_msg = ' has 1 plus '
+            pluses_msg = " has 1 plus "
         else:
-            pluses_msg = ' has %s pluses ' % self.pluses
+            pluses_msg = " has %s pluses " % self.pluses
 
         if self.minuses == 1:
-            minuses_msg = 'and 1 minus '
+            minuses_msg = "and 1 minus "
         else:
-            minuses_msg = 'and %s minuses ' % self.minuses
+            minuses_msg = "and %s minuses " % self.minuses
 
         if self.total_score == 1:
-            total_msg = 'for a total of 1 point.'
+            total_msg = "for a total of 1 point."
         else:
-            total_msg = 'for a total of %s points.' % self.total_score
+            total_msg = "for a total of %s points." % self.total_score
 
         return self.name + pluses_msg + minuses_msg + total_msg
 
@@ -73,9 +76,10 @@ class KarmaItem():
         representation of a KarmaItem
         """
         key_list = a_dict.keys()
-        if 'name' in key_list and 'pluses' in key_list and 'minuses' in key_list:
-            return KarmaItem(a_dict['name'], a_dict['pluses'], a_dict['minuses'])
+        if "name" in key_list and "pluses" in key_list and "minuses" in key_list:
+            return KarmaItem(a_dict["name"], a_dict["pluses"], a_dict["minuses"])
         return a_dict
+
 
 class KarmaItemEncoder(json.JSONEncoder):
     """
@@ -85,7 +89,8 @@ class KarmaItemEncoder(json.JSONEncoder):
     representation of the object, otherwise we just call the superclass's implementation of default
     and let it handle the object.
     """
+
     def default(self, o):
         if isinstance(o, KarmaItem):
-            return {'name': o.name, 'pluses': o.pluses, 'minuses': o.minuses}
+            return {"name": o.name, "pluses": o.pluses, "minuses": o.minuses}
         return super().default(o)
