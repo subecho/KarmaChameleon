@@ -29,6 +29,7 @@ app = Flask(__name__)
 increment_regex = re.compile(r'^\S+\s?\+\+.*$')
 decrement_regex = re.compile(r'^\S+\s?--.*$')
 
+
 def clean_up_message(message):
     """Clean up the passed message.
 

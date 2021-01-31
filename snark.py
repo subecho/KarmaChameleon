@@ -117,9 +117,11 @@ negative_messages = [
     'Sub-par.',
 ]
 
+
 def get_positive_message():
     """Return a random selection from positive_messages"""
     return random.choice(positive_messages)
+
 
 def get_negative_message():
     """Return a random selection from negative_messages"""
