@@ -26,21 +26,28 @@ from logging.handlers import RotatingFileHandler
 from flask import Flask, request, make_response
 from bot import KarmaBot
 
-# The "primary" logger is for the Flask app.  Both event_manager and the KarmaBot have their own
-# loggers.
+# There is only one logger, with three different sub-loggers.  All loggers use the same file
+# destination, and line format.  The logger with UID "karma_chameleon" is used to log events for the
+# main app, i.e. the Flask app.  karma_chameleon.event_manager logs events and debug info pertaining
+# to the event_manager.py methods.  karma_chameleon.bot logs events and debug info pertaining to the
+# methods of the KarmaBot class.
+#
+# If the logs dir does not exit, make it.
 if not os.path.exists('logs'):
     os.makedirs('logs')
+
+# Create the "main" logger.  This logger has the file destination and line format that is inherited
+# by all sub-loggers.
 logger = logging.getLogger('karma_chameleon')
 logger.setLevel(logging.DEBUG)
-file_handler = RotatingFileHandler('logs/karma_chameleon.log', maxBytes=250000000, backupCount=3)
-
+file_handler = RotatingFileHandler('logs/karma_chameleon.log', maxBytes=10_000_000, backupCount=3)
 file_handler.setLevel(logging.DEBUG)
 formatter = logging.Formatter('%(asctime)s %(name)s %(levelname)s[%(funcName)s]: %(message)s')
 file_handler.setFormatter(formatter)
 logger.addHandler(file_handler)
 
+# Create a sub-logger for the event_manager methods.
 em_logger = logging.getLogger('karma_chameleon.event_manager')
-
 
 karmaBot = KarmaBot()
 app = Flask(__name__)
