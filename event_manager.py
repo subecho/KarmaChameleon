@@ -125,7 +125,7 @@ def listen():
     """
     event = json.loads(request.data)
 
-    logger.debug("Handling event %s, %s", event{"type"}, event{"event"}.get("subtype"))
+    logger.debug("Handling event %s, %s", event["type"], event["event"].get("subtype"))
     if "challenge" in event:
         return _create_challenge_response(event["challenge"])
 
