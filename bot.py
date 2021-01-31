@@ -165,7 +165,6 @@ class KarmaBot:
                 'icon_emoji': self.emoji,
             })
 
-
     def send_message(self, message: str, channel_id: str):
         """Send a message to the passed Slack channel.
 
@@ -208,6 +207,8 @@ class KarmaBot:
         karma_file = Path(self.karma_file_path)
         if not karma_file.is_file():
             print('No existing file found. Will start fresh.')
+            with open(self.karma_file_path, 'w') as file_ptr:
+                file_ptr.write('[]')
             return
         with open(self.karma_file_path, 'r') as file_ptr:
             karma_list = json.load(file_ptr, object_hook=KarmaItem.dict_to_karmaitem)
