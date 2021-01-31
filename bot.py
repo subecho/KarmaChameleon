@@ -27,6 +27,7 @@ from slack import WebClient
 from karma_item import KarmaItem, KarmaItemEncoder
 from snark import get_positive_message, get_negative_message
 
+
 class KarmaBot:
     """Basic Bot object which is able to read incoming messages from Slack and send responses.
     The bot is also able to read karma from the json save-file, and make changes to the same.
