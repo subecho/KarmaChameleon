@@ -23,7 +23,6 @@ import logging
 from pathlib import Path
 
 import pandas as pd
-from slack import WebClient
 
 from karma_item import KarmaItem, KarmaItemEncoder
 from snark import get_positive_message, get_negative_message
@@ -45,7 +44,6 @@ class KarmaBot:
         # Since our app is only going to be installed in one workspace, we can use the pre-generated
         # OAuth token that Slack gave us when we created our app.
         self.oauth_token = os.environ.get("BOT_OAUTH_TOKEN")
-        self.client = WebClient(self.oauth_token)
         self.karma = {}
         self.karma_file_path = os.environ.get("KARMA_FILE_PATH")
 
@@ -214,12 +212,6 @@ class KarmaBot:
         )
         self.logger.debug(message)
         self.send_message(message, channel_id)
-
-    def _send_chastise_message(self, channel_id: str):
-        self.send_message("Ahem, no self-bumping...", channel_id)
-
-    def _send_encouragement_message(self, channel_id: str):
-        self.send_message("Now, now.  Don't be so hard on yourself!", channel_id)
 
     def _save_karma_to_json_file(self):
         self.logger.debug('Saving karma JSON to file %s', self.karma_file_path)
