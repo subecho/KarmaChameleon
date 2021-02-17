@@ -1,5 +1,5 @@
 # Karma Chameleon
-# Copyright (C) 2021 Dustin Schoenbrun, Will Rideout
+# Copyright (C) 2021 Dustin Schoenbrun, Will Rideout, Ben Decato
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
