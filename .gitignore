@@ -108,3 +108,7 @@ venv.bak/
 
 # Visual Studio Code
 .vscode/
+
+# KarmaChameleon logs dir and JSON DB file
+logs/
+karma.json
