@@ -39,4 +39,9 @@ In one terminal window, run:
 After running that, in another terminal window, run:
 `ngrok http 5000`
 
-This command will output an https URL that can be used to interact with the bot. You will want to paste this URL into the _Request URL_ field in the _Event Subscriptions_ page for your app. You will also want to make sure that you add the `message.channels` event to the subscribed events for the bot.
+This command will output an https URL that can be used to interact with the bot. You will want to
+paste this URL into the _Request URL_ field in the _Event Subscriptions_ page for your app. You will
+also want to make sure that you add the `message.channels` event to the subscribed events for the
+bot.
+
+The KarmaChameleon icon was made by [Eucalyp](https://www.flaticon.com/authors/eucalyp) from www.flaticon.com.
