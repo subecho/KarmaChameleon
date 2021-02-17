@@ -173,7 +173,7 @@ def decrement(message, say):
         logger.debug("Got decrement for %s", item)
 
 
-@app.command("/ec_leaderboard")
+@app.command("/leaderboard")
 def show_leaderboard(ack, say, _):
     """Print user and thing leaderboards, sorted by total karma accrued.
 
