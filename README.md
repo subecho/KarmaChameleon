@@ -52,6 +52,16 @@ There are two steps to running the bot on your local machine: running the actual
 forwarding the port that the Flask server is running on to a publicly accessible URL. I used
 [ngrok](https://ngrok.com) to do this and it’s available via Brew on macOS.
 
+The following environment variables must be present in order for Karma Chameleon to function:
+- SLACK_BOT_TOKEN; populated with the contents of the SLACK_BOT_TOKEN OAuth key in the Slack App
+OAuth settings
+- SLACK_SIGNING_SECRET; populated with the Signing Secret key found in the Slack App Basic
+  Information settings.
+- KARMA_FILE_PATH; the path to which Karma Chameleon may create and maintain a JSON record of all
+karma.
+- PORT; port via which Karma Chameleon and Slack will communicate.  This is optional and has a
+  default value of 3000
+
 In one terminal window, run:
 `python3 karma_chameleon.py`
 
@@ -65,4 +75,5 @@ also want to make sure that you add the `message.channels` event to the subscrib
 bot.  For slash-command support, a new command must be added with the request URL also being the
 ngrok URL in the format of "<ngrok URL>/slack/events".
 
-The Karma Chameleon icon was made by [Eucalyp](https://www.flaticon.com/authors/eucalyp) from www.flaticon.com.
+The Karma Chameleon icon was made by [Eucalyp](https://www.flaticon.com/authors/eucalyp) from
+www.flaticon.com.
