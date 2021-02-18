@@ -27,13 +27,15 @@ import logging
 from logging.handlers import RotatingFileHandler
 import json
 from pathlib import Path
+from typing import Any, Callable
 import pandas as pd
-from slack_bolt import App
+from slack_bolt import Ack, App, BoltResponse, Say
 from slack_sdk import WebClient
 from slack_sdk.errors import SlackApiError
 
 from snark import get_positive_message, get_negative_message
 from karma_item import KarmaItem, KarmaItemEncoder
+
 
 # There is only one logger, with three different sub-loggers.  All loggers use the same file
 # destination, and line format.  The logger with UID "karma_chameleon" is used to log events for the
@@ -68,6 +70,9 @@ app = App(
 karma = {}
 karma_file_path = os.environ.get("KARMA_FILE_PATH")
 
+inc_regex = re.compile(r"^\S+\s?\+\+.*$")
+dec_regex = re.compile(r"^\S+\s?--.*$")
+
 
 def load_karma_from_json_file():
     """Load karma from the JSON file stored at the KARMA_FILE_PATH environment variable"""
@@ -96,7 +101,7 @@ def save_karma_to_json_file():
 load_karma_from_json_file()
 
 
-def clean_up_msg_text(msg):
+def clean_up_msg_text(msg: str) -> str:
     """Clean up the passed message.
     Format should be (TOKEN(++|--) trailing_garbage).  All we need to do here is get the first
     token and strip off the last two chars.  If the token contains either a '#' or a '@', then that
@@ -116,15 +121,47 @@ def clean_up_msg_text(msg):
     return msg
 
 
-def check_for_self_bump(msg):
+def check_for_self_bump(msg: str) -> bool:
     """Returns true if the passed message text contains a self-bump, i.e. the sending username is
     also present in the text as the karma target.
     """
     return msg["user"] in msg["text"]
 
 
-@app.message(re.compile(r"^\S+\s?\+\+.*$"))
-def increment(message, say):
+@app.middleware
+def handle_no_karma_op(
+    body: dict, next: Callable
+) -> Any:  # pylint: disable=redefined-builtin
+    """Middleware which enables KarmaChameleon to immediately and gracefully handle events which do
+    not contain any karma operations or slash-commands.
+
+    Unfortunately the Slack Bolt API requires that the next middleware method be referred to as
+    "next", which is a built-in.  You can't win them all I suppose...
+
+    Arguments:
+    body -- a dict containing the entire Slack Bolt API event
+    next_middleware -- callable reference to the next middleware listener.
+
+    Returns:
+    If the incoming event contains a karma operation, then the next middleware listener is returned
+    and invoked by the caller of this middleware.  If there is no karma operation contained in the
+    event, and the event is not a command, then a BoltResponse(200) is returned as we have nothing
+    further to do.
+    """
+    if body.get("command"):
+        return next()
+
+    if body["event"]["type"] == "message":
+        msg = body["event"]["text"]
+        if inc_regex.match(msg) or dec_regex.match(msg):
+            return next()
+    # This is too chatty to be left enabled, but it may be useful for debug in the future.
+    # logger.debug("Ignoring event with no karma operation")
+    return BoltResponse(status=200, body="Ignoring event with no karma operation")
+
+
+@app.message(inc_regex)
+def increment(message: dict, say: Say):
     """Increment karma for a passed item, and send a corresponding message to the channel inside
     which the karma was bumped.
 
@@ -148,8 +185,8 @@ def increment(message, say):
         logger.debug("Got increment for %s", item)
 
 
-@app.message(re.compile(r"^\S+\s?--.*$"))
-def decrement(message, say):
+@app.message(dec_regex)
+def decrement(message: dict, say: Say):
     """Decrement karma for a passed item, and send a corresponding message to the channel inside
     which the karma was bumped.
 
@@ -174,12 +211,13 @@ def decrement(message, say):
 
 
 @app.command("/leaderboard")
-def show_leaderboard(ack, say, _):
+def show_leaderboard(ack: Ack, say: Say):
     """Print user and thing leaderboards, sorted by total karma accrued.
 
     Arguments:
     ack -- acknowledgement method, called to acknowledge the command was received
     say -- method for printing back to the same channel from which the command was run
+    _ -- unused argument for the command, passed by the caller of show_leaderboard
     """
     # Must acknowledge the command was run.
     ack()
