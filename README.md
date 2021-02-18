@@ -55,7 +55,7 @@ forwarding the port that the Flask server is running on to a publicly accessible
 The following environment variables must be present in order for Karma Chameleon to function:
 - `SLACK_BOT_TOKEN`: populated with the contents of the SLACK_BOT_TOKEN OAuth key in the Slack App
 OAuth settings
-- SLACK_SIGNING_SECRET; populated with the Signing Secret key found in the Slack App Basic
+- `SLACK_SIGNING_SECRET`: populated with the Signing Secret key found in the Slack App Basic
   Information settings.
 - `KARMA_FILE_PATH`: the path to which Karma Chameleon will create and maintain a JSON record of all
 karma.
