@@ -53,7 +53,7 @@ forwarding the port that the Flask server is running on to a publicly accessible
 [ngrok](https://ngrok.com) to do this and it’s available via Brew on macOS.
 
 The following environment variables must be present in order for Karma Chameleon to function:
-- SLACK_BOT_TOKEN; populated with the contents of the SLACK_BOT_TOKEN OAuth key in the Slack App
+- `SLACK_BOT_TOKEN`: populated with the contents of the SLACK_BOT_TOKEN OAuth key in the Slack App
 OAuth settings
 - SLACK_SIGNING_SECRET; populated with the Signing Secret key found in the Slack App Basic
   Information settings.
