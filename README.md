@@ -59,7 +59,7 @@ OAuth settings
   Information settings.
 - `KARMA_FILE_PATH`: the path to which Karma Chameleon will create and maintain a JSON record of all
 karma.
-- PORT; port via which Karma Chameleon and Slack will communicate.  This is optional and has a
+- `PORT`: port via which Karma Chameleon and Slack will communicate.  This is optional and has a
   default value of 3000
 
 In one terminal window, run:
