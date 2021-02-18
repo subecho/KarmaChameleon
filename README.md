@@ -48,9 +48,9 @@ a new app in Slack and add the following scopes:
 **User Token Scopes:**
 - channels:history
 
-There are two steps to running the bot on your local machine: running the actual Python code and
-forwarding the port that the Flask server is running on to a publicly accessible URL. I used
-[ngrok](https://ngrok.com) to do this and it’s available via Brew on macOS.
+There are two steps to testing the bot on your local machine: running the code and forwarding the
+port on which Karma Chameleon is listening to some publicly available URL. The CLI tool
+[ngrok](https://ngrok.com) may be used to do this.
 
 The following environment variables must be present in order for Karma Chameleon to function:
 - `SLACK_BOT_TOKEN`: populated with the contents of the SLACK_BOT_TOKEN OAuth key in the Slack App
