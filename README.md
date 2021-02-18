@@ -57,7 +57,7 @@ The following environment variables must be present in order for Karma Chameleon
 OAuth settings
 - SLACK_SIGNING_SECRET; populated with the Signing Secret key found in the Slack App Basic
   Information settings.
-- KARMA_FILE_PATH; the path to which Karma Chameleon may create and maintain a JSON record of all
+- `KARMA_FILE_PATH`: the path to which Karma Chameleon will create and maintain a JSON record of all
 karma.
 - PORT; port via which Karma Chameleon and Slack will communicate.  This is optional and has a
   default value of 3000
