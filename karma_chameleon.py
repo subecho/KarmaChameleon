@@ -130,8 +130,8 @@ def check_for_self_bump(msg: str) -> bool:
 
 @app.middleware
 def handle_no_karma_op(
-    body: dict, next: Callable
-) -> Any:  # pylint: disable=redefined-builtin
+    body: dict, next: Callable  # pylint: disable=redefined-builtin
+) -> Any:
     """Middleware which enables KarmaChameleon to immediately and gracefully handle events which do
     not contain any karma operations or slash-commands.
 
