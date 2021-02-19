@@ -117,7 +117,7 @@ def decrement(message: dict, say: Say) -> None:
     say(rsp)
 
 
-@app.command("/ec_leaderboard")
+@app.command("/leaderboard")
 def show_leaderboard(ack: Ack, say: Say) -> None:
     """Invoke leaderboard display from the karmaChameleon bot.
 
