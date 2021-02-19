@@ -25,7 +25,7 @@ from typing import Any
 class KarmaItem:
     """Object representation of a thing, and the karma associated with that thing."""
 
-    def __init__(self, name: str, pluses: int = 0, minuses: int = 0):
+    def __init__(self, name: str, pluses: int = 0, minuses: int = 0) -> None:
         super().__init__()
         self.name = name
         self.pluses = pluses
