@@ -23,6 +23,7 @@ import logging
 import re
 import json
 from pathlib import Path
+from typing import Tuple
 import pandas as pd
 from slack_bolt import App
 from slack_sdk import WebClient
@@ -150,7 +151,7 @@ class KarmaBot(App):
         self.logger.debug("Got decrement for %s", item)
         return f"{snark} {item} now has {total} points."
 
-    def display_karma_leaderboards(self) -> tuple[str, str, str]:
+    def display_karma_leaderboards(self) -> Tuple[str, str, str]:
         """Prints rudimentary user and thing leaderboards.
 
         Returns
