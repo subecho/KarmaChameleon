@@ -82,7 +82,7 @@ def handle_no_karma_op(
     if body.get("command"):
         return next()
 
-    if body["event"]["type"] == "message" and body["event"]["text"]:
+    if body["event"]["type"] == "message" and "text" in body["event"]:
         msg = body["event"]["text"]
         if app.inc_regex.match(msg) or app.dec_regex.match(msg):
             return next()
