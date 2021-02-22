@@ -118,11 +118,11 @@ negative_messages = [
 ]
 
 
-def get_positive_message():
+def get_positive_message() -> str:
     """Return a random selection from positive_messages"""
     return random.choice(positive_messages)
 
 
-def get_negative_message():
+def get_negative_message() -> str:
     """Return a random selection from negative_messages"""
     return random.choice(negative_messages)

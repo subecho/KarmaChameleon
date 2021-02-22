@@ -19,23 +19,24 @@ Implements an item which stores a name and that thing's karma score as a factor 
 and minuses.
 """
 import json
+from typing import Any
 
 
 class KarmaItem:
     """Object representation of a thing, and the karma associated with that thing."""
 
-    def __init__(self, name: str, pluses: int = 0, minuses: int = 0):
+    def __init__(self, name: str, pluses: int = 0, minuses: int = 0) -> None:
         super().__init__()
         self.name = name
         self.pluses = pluses
         self.minuses = minuses
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return self.__class__.__name__ + "({!r}, {!r}, {!r})".format(
             self.name, self.pluses, self.minuses
         )
 
-    def __str__(self):
+    def __str__(self) -> str:
         if self.pluses == 1:
             pluses_msg = " has 1 plus "
         else:
@@ -54,7 +55,7 @@ class KarmaItem:
         return self.name + pluses_msg + minuses_msg + total_msg
 
     @property
-    def total_score(self):
+    def total_score(self) -> int:
         """
         Calculated property which returns the total score which is pluses - minuses.
 
@@ -64,7 +65,7 @@ class KarmaItem:
         return self.pluses - self.minuses
 
     @staticmethod
-    def dict_to_karmaitem(a_dict: dict):
+    def dict_to_karmaitem(a_dict: dict) -> dict:
         """
         Return a KarmaItem if a_dict is a representation of a KarmaItem or a_dict unmodified
         otherwise.
@@ -90,7 +91,7 @@ class KarmaItemEncoder(json.JSONEncoder):
     and let it handle the object.
     """
 
-    def default(self, o):
+    def default(self, o: Any) -> Any:
         if isinstance(o, KarmaItem):
             return {"name": o.name, "pluses": o.pluses, "minuses": o.minuses}
         return super().default(o)
