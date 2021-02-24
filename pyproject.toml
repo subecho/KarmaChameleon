@@ -18,3 +18,19 @@ exclude = '''
   )/
 )
 '''
+
+[tool.pytest.ini_options]
+minversion = "6.2.2"
+addopts = "-ra -v --cov"
+
+[tool.coverage.run]
+omit = [
+  ".venv/*",
+  "tests/*",
+  "setup.py",
+  "*__init__.py*",
+]
+branch = true
+
+[tool.coverage.report]
+precision = 2
