@@ -22,8 +22,10 @@ import unittest
 from unittest import TestCase
 import snark
 
+
 class TestSnark(TestCase):
     """Simple unit test class for exercising snark"""
+
     def test_snark(self) -> None:
         """Verify get_positive_message and get_negative_message"""
         msg = snark.get_positive_message()
@@ -35,6 +37,7 @@ class TestSnark(TestCase):
         assert msg
         assert msg in snark.negative_messages
         assert msg not in snark.positive_messages
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -23,6 +23,7 @@ from unittest import TestCase
 import json
 from karma_item import KarmaItem, KarmaItemEncoder
 
+
 class TestKarmaItem(TestCase):
     """Class containing unit tests for the KarmaItem class of the karma_item module."""
 
@@ -76,10 +77,11 @@ class TestKarmaItem(TestCase):
         # JSONEncoder class instead.
         """Verify that JSON serialization works"""
         result = json.dumps([], cls=KarmaItemEncoder)
-        assert result == '[]'
+        assert result == "[]"
 
         json_str = json.dumps(KarmaItem("foobarbaz", 9001, 10), cls=KarmaItemEncoder)
-        assert json_str == "{\"name\": \"foobarbaz\", \"pluses\": 9001, \"minuses\": 10}"
+        assert json_str == '{"name": "foobarbaz", "pluses": 9001, "minuses": 10}'
+
 
 if __name__ == "__main__":
     unittest.main()
