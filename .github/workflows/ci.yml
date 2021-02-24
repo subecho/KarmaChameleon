@@ -1,4 +1,4 @@
-name: Project Tests
+name: CI Tests
 on:
   push:
     branches:
