@@ -1,5 +1,6 @@
 # Karma Chameleon
 ![](https://github.com/subecho/KarmaChameleon/workflows/CI%20Tests/badge.svg)
+
 A simple karma bot for Slack.
 
 This is a simple, standalone Slack bot that watches for “karma events” and will keep track of scores
