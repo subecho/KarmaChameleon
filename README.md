@@ -11,11 +11,15 @@ In a channel where Karma Chameleon is present, do the following to add a point t
 
 `@user++`
 
+`subject++`
+
 ## Removing Karma
 In a channel where Karma Chameleon is present, do the following to remove a point from the user or
 topic.
 
 `@user—-`
+
+`subject--`
 
 Note that decementing or incrementing a user's own karma (the self-bump) is not a valid operation.
 You will be chastised by the Chameleon.
