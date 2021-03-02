@@ -1,18 +1,15 @@
-# Karma Chameleon
-# Copyright (C) 2021 Will Rideout
+# Karma Chameleon Copyright (C) 2021 Will Rideout
 #
-# This program is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
+# This program is free software: you can redistribute it and/or modify it under the terms
+# of the GNU General Public License as published by the Free Software Foundation, either
+# version 3 of the License, or (at your option) any later version.
 #
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
+# This program is distributed in the hope that it will be useful, but WITHOUT ANY
+# WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
+# PARTICULAR PURPOSE.  See the GNU General Public License for more details.
 #
-# You should have received a copy of the GNU General Public License
-# along with this program. If not, see <http://www.gnu.org/licenses/>.
+# You should have received a copy of the GNU General Public License along with this
+# program. If not, see <http://www.gnu.org/licenses/>.
 
 """
 Unit testing for the KarmaChameleon App proper.
@@ -45,7 +42,8 @@ with mock.patch.dict(
 
 
 class TestApp(TestCase):
-    """Class containing unit tests for the app functionality of the main karma_chameleon module."""
+    """Class containing unit tests for the app functionality of the main karma_chameleon
+    module."""
 
     callable_called = "next_method was called"
     test_msg = {"event": {"type": "message", "text": "foobarbaz"}}
@@ -58,7 +56,8 @@ class TestApp(TestCase):
         print(msg)
 
     class SpoofAck(Ack):  # pylint: disable=too-few-public-methods
-        """Child class of the Slack Bolt API Spoof class, which allows us to verify ack was called."""
+        """Child class of the Slack Bolt API Spoof class, which allows us to verify ack
+        was called."""
 
         ack_msg = "Ack was called!"
 
@@ -66,8 +65,8 @@ class TestApp(TestCase):
             print(self.ack_msg)
 
     def test_handle_no_karma_op(self) -> None:
-        """Test for verifying the behavior of the middleware which allows the kc bot to skip any
-        incoming event which does not contain a karma operation
+        """Test for verifying the behavior of the middleware which allows the kc bot to
+        skip any incoming event which does not contain a karma operation
         """
         # import karma_chameleon as kc # pylint: disable=import-outside-toplevel
 

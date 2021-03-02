@@ -1,21 +1,19 @@
-# Karma Chameleon
-# Copyright (C) 2021 Dustin Schoenbrun, Will Rideout, Ben Decato
+# Karma Chameleon Copyright (C) 2021 Dustin Schoenbrun, Will Rideout, Ben Decato
 #
-# This program is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
+# This program is free software: you can redistribute it and/or modify it under the terms
+# of the GNU General Public License as published by the Free Software Foundation, either
+# version 3 of the License, or (at your option) any later version.
 #
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
+# This program is distributed in the hope that it will be useful, but WITHOUT ANY
+# WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
+# PARTICULAR PURPOSE.  See the GNU General Public License for more details.
 #
-# You should have received a copy of the GNU General Public License
-# along with this program. If not, see <http://www.gnu.org/licenses/>.
+# You should have received a copy of the GNU General Public License along with this
+# program. If not, see <http://www.gnu.org/licenses/>.
 
 """
-Defines the bot that which is passed Slack event message text and responds to them accordingly
+Defines the bot that which is passed Slack event message text and responds to them
+accordingly
 """
 
 import os
@@ -34,8 +32,9 @@ from karma_chameleon.snark import get_positive_message, get_negative_message
 
 
 class KarmaBot(App):
-    """Basic Bot object which is able to read incoming messages from Slack and return responses.
-    The bot is also able to read karma from the json save-file, and make changes to the same.
+    """Basic Bot object which is able to read incoming messages from Slack and return
+    responses.  The bot is also able to read karma from the json save-file, and make
+    changes to the same.
     """
 
     def __init__(self, token: str, signing_secret: str) -> None:
@@ -76,16 +75,14 @@ class KarmaBot(App):
 
     @staticmethod
     def _clean_up_msg_text(msg: dict) -> str:
-        """Clean up the passed message.
-        Format should be (TOKEN(++|--) trailing_garbage).  All we need to do here is get the first
-        token and strip off the last two chars.  If the token contains either a '#' or a '@', then
-        that leading character is also stripped.
+        """Clean up the passed message.  Format should be (TOKEN(++|--) trailing_garbage).
+        All we need to do here is get the first token and strip off the last two chars.
+        If the token contains either a '#' or a '@', then that leading character is also
+        stripped.
 
-        Arguments:
-        msg -- text which contains a karma operation
+        Arguments: msg -- text which contains a karma operation
 
-        Returns:
-        Cleaned message
+        Returns: Cleaned message
         """
         msg = msg["text"].split()[0]  # remove trailing garbage
         if msg[-2:] in ("++", "--"):
@@ -96,20 +93,19 @@ class KarmaBot(App):
 
     @staticmethod
     def _check_for_self_bump(msg: dict) -> bool:
-        """Returns true if the passed message text contains a self-bump, i.e. the sending username
-        is also present in the text as the karma target.
+        """Returns true if the passed message text contains a self-bump, i.e. the sending
+        username is also present in the text as the karma target.
         """
         return msg["user"] in msg["text"]
 
     def increment_karma(self, msg: dict) -> str:
-        """Increment karma for a passed item, and pass a corresponding message to the channel inside
-        which the karma was bumped to be sent.
+        """Increment karma for a passed item, and pass a corresponding message to the
+        channel inside which the karma was bumped to be sent.
 
-        Arguments:
-        msg -- text containing a karma event
+        Arguments: msg -- text containing a karma event
 
-        Returns:
-        A message to be sent back to the channel in which the karma event occurred.
+        Returns: A message to be sent back to the channel in which the karma event
+        occurred.
         """
         self.logger.debug("Processing increment message.")
         if self._check_for_self_bump(msg):
@@ -127,14 +123,13 @@ class KarmaBot(App):
         return f"{snark} {item} now has {total} points."
 
     def decrement_karma(self, msg: dict) -> str:
-        """Decrement karma for a passed item, and pass a corresponding message to the channel inside
-        which the karma was bumped to be sent.
+        """Decrement karma for a passed item, and pass a corresponding message to the
+        channel inside which the karma was bumped to be sent.
 
-        Arguments:
-        msg -- text containing a karma event
+        Arguments: msg -- text containing a karma event
 
-        Returns:
-        A message to be sent back to the channel in which the karma event occurred.
+        Returns: A message to be sent back to the channel in which the karma event
+        occurred.
         """
         self.logger.debug("Processing decrement message.")
         if self._check_for_self_bump(msg):
@@ -154,9 +149,8 @@ class KarmaBot(App):
     def display_karma_leaderboards(self) -> Tuple[str, str, str]:
         """Prints rudimentary user and thing leaderboards.
 
-        Returns
-        A message, if applicable, a string representation of the user leaderboard, and a string
-        representation of the thing leaderboard.
+        Returns A message, if applicable, a string representation of the user leaderboard,
+        and a string representation of the thing leaderboard.
         """
         try:
             cur_karma = pd.read_json(self.karma_file_path)
@@ -171,8 +165,8 @@ class KarmaBot(App):
             return ("No karma yet!", "", "")
 
         try:
-            # Add @here, @everyone, and @channel to the user list. Specific channels
-            # can remain in the thing list.
+            # Add @here, @everyone, and @channel to the user list. Specific channels can
+            # remain in the thing list.
             odd_karma = cur_karma[cur_karma["name"].str.startswith("<!")]
             thing_karma = pd.concat([thing_karma, odd_karma]).drop_duplicates(keep=False)
             odd_karma["name"] = odd_karma["name"].map(
