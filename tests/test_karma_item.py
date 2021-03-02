@@ -21,7 +21,7 @@ Unit testing for the KarmaChameleon KarmaItem class.
 import unittest
 from unittest import TestCase
 import json
-from karma_item import KarmaItem, KarmaItemEncoder
+from karma_chameleon.karma_item import KarmaItem, KarmaItemEncoder
 
 
 class TestKarmaItem(TestCase):

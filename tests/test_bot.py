@@ -21,8 +21,8 @@ import os
 from unittest import TestCase
 from unittest import mock
 
-from bot import KarmaBot
-from karma_item import KarmaItem
+from karma_chameleon.bot import KarmaBot
+from karma_chameleon.karma_item import KarmaItem
 
 @mock.patch.dict(
     os.environ,

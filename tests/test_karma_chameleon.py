@@ -36,7 +36,7 @@ with mock.patch.dict(
     },
 ):
     with mock.patch("slack_bolt.App._init_middleware_list"):
-        from karma_chameleon import (
+        from karma_chameleon.main import (
             handle_no_karma_op,
             increment,
             decrement,
@@ -99,7 +99,7 @@ class TestApp(TestCase):
             retval = handle_no_karma_op(body, self._next_method)
             assert verify_method(retval)
 
-    @mock.patch("bot.KarmaBot.increment_karma")
+    @mock.patch("karma_chameleon.bot.KarmaBot.increment_karma")
     def test_increment(self, app_inc_karma) -> None:
         """Test the method of the main app which calls the bot increment."""
         msg = "Got the message!"
@@ -110,7 +110,7 @@ class TestApp(TestCase):
             assert app_inc_karma.inc_karma.called_with(self.test_msg)
             assert out.getvalue() == msg + "\n"
 
-    @mock.patch("bot.KarmaBot.decrement_karma")
+    @mock.patch("karma_chameleon.bot.KarmaBot.decrement_karma")
     def test_decrement(self, app_dec_karma) -> None:
         """Test the method of the main app which calls the bot decrement."""
         msg = "Got the message!"
@@ -121,7 +121,7 @@ class TestApp(TestCase):
             assert app_dec_karma.inc_karma.called_with(self.test_msg)
             assert out.getvalue() == msg + "\n"
 
-    @mock.patch("bot.KarmaBot.display_karma_leaderboards")
+    @mock.patch("karma_chameleon.bot.KarmaBot.display_karma_leaderboards")
     def test_show_leaderboard(self, app_leaderboard):
         """Test the method of the main app which calls the bot leaderboard method."""
         ack = self.SpoofAck()

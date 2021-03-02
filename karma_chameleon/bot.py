@@ -29,8 +29,8 @@ from slack_bolt import App
 from slack_sdk import WebClient
 from slack_sdk.errors import SlackApiError
 
-from karma_item import KarmaItem, KarmaItemEncoder
-from snark import get_positive_message, get_negative_message
+from karma_chameleon.karma_item import KarmaItem, KarmaItemEncoder
+from karma_chameleon.snark import get_positive_message, get_negative_message
 
 
 class KarmaBot(App):

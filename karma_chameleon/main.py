@@ -27,7 +27,7 @@ from logging.handlers import RotatingFileHandler
 from typing import Callable, Union
 from slack_bolt import Ack, BoltResponse, Say
 
-from bot import KarmaBot
+from karma_chameleon.bot import KarmaBot
 
 # There is only one logger, with three different sub-loggers.  All loggers use the same file
 # destination, and line format.  The logger with UID "karma_chameleon" is used to log events for the
