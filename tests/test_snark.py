@@ -31,13 +31,10 @@ class TestSnark(TestCase):
         msg = snark.get_positive_message()
         assert msg
         assert msg in snark.positive_messages
-        assert msg not in snark.negative_messages
 
         msg = snark.get_negative_message()
         assert msg
         assert msg in snark.negative_messages
-        assert msg not in snark.positive_messages
-
 
 if __name__ == "__main__":
     unittest.main()

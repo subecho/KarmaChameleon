@@ -75,7 +75,7 @@ class KarmaBot(App):
             json.dump(karma_list, file_ptr, cls=KarmaItemEncoder)
 
     @staticmethod
-    def _clean_up_msg_text(msg: str) -> str:
+    def _clean_up_msg_text(msg: dict) -> str:
         """Clean up the passed message.
         Format should be (TOKEN(++|--) trailing_garbage).  All we need to do here is get the first
         token and strip off the last two chars.  If the token contains either a '#' or a '@', then
@@ -95,13 +95,13 @@ class KarmaBot(App):
         return msg
 
     @staticmethod
-    def _check_for_self_bump(msg: str) -> bool:
+    def _check_for_self_bump(msg: dict) -> bool:
         """Returns true if the passed message text contains a self-bump, i.e. the sending username
         is also present in the text as the karma target.
         """
         return msg["user"] in msg["text"]
 
-    def increment_karma(self, msg: str) -> str:
+    def increment_karma(self, msg: dict) -> str:
         """Increment karma for a passed item, and pass a corresponding message to the channel inside
         which the karma was bumped to be sent.
 
@@ -126,7 +126,7 @@ class KarmaBot(App):
         self.logger.debug("Got increment for %s", item)
         return f"{snark} {item} now has {total} points."
 
-    def decrement_karma(self, msg: str) -> str:
+    def decrement_karma(self, msg: dict) -> str:
         """Decrement karma for a passed item, and pass a corresponding message to the channel inside
         which the karma was bumped to be sent.
 
