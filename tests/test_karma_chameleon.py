@@ -62,7 +62,7 @@ class TestApp(TestCase):
 
         ack_msg = "Ack was called!"
 
-        def __call__(self):  # pylint: disable=signature-differs
+        def __call__(self, **kwargs):  # pylint: disable=signature-differs
             print(self.ack_msg)
 
     def test_handle_no_karma_op(self) -> None:

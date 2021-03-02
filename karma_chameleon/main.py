@@ -62,7 +62,7 @@ app = KarmaBot(
 @app.middleware
 def handle_no_karma_op(
     body: dict, next: Callable  # pylint: disable=redefined-builtin
-) -> Union[Callable,BoltResponse]: # pylint: disable=unsubscriptable-object
+) -> Union[Callable, BoltResponse]:  # pylint: disable=unsubscriptable-object
     """Middleware which enables KarmaChameleon to immediately and gracefully handle events which do
     not contain any karma operations or slash-commands.
 

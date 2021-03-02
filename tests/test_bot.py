@@ -24,6 +24,7 @@ from unittest import mock
 from karma_chameleon.bot import KarmaBot
 from karma_chameleon.karma_item import KarmaItem
 
+
 @mock.patch.dict(
     os.environ,
     {
@@ -36,6 +37,7 @@ from karma_chameleon.karma_item import KarmaItem
 @mock.patch("slack_bolt.App._init_middleware_list")
 class TestBot(TestCase):
     """Class for all KarmaBot-related unit tests"""
+
     # pylint: disable=protected-access
 
     def cleanup(self):
@@ -68,7 +70,7 @@ class TestBot(TestCase):
         assert bot.karma.get("foobar").pluses == 1
         assert bot.karma.get("foobar").minuses == 1
 
-        bot.karma[ "baz" ] = KarmaItem("baz", 10, 10)
+        bot.karma["baz"] = KarmaItem("baz", 10, 10)
         bot._save_karma_to_json_file()
         with open(self.karma_file_path, "r") as file_ptr:
             lines = file_ptr.readline()
@@ -97,7 +99,7 @@ class TestBot(TestCase):
         )
         for case in cases:
             exp_return_val, text = case
-            event = { "text": text }
+            event = {"text": text}
             clean_msg = bot._clean_up_msg_text(event)
             assert clean_msg == exp_return_val
 
@@ -110,9 +112,9 @@ class TestBot(TestCase):
             (False, {"user": "AdaLovelace", "text": "GraceHopper++"}),
         ]
         bot = KarmaBot(
-                token=os.environ.get("SLACK_BOT_TOKEN"),
-                signing_secret=os.environ.get("SLACK_SIGNING_SECRET"),
-            )
+            token=os.environ.get("SLACK_BOT_TOKEN"),
+            signing_secret=os.environ.get("SLACK_SIGNING_SECRET"),
+        )
 
         for case in cases:
             exp_return_value, event = case
@@ -123,17 +125,17 @@ class TestBot(TestCase):
     def test_increment_and_decrement(self, _) -> None:
         """Test KarmaBot increment and decrement functionality"""
         bot = KarmaBot(
-                token=os.environ.get("SLACK_BOT_TOKEN"),
-                signing_secret=os.environ.get("SLACK_SIGNING_SECRET"),
-            )
+            token=os.environ.get("SLACK_BOT_TOKEN"),
+            signing_secret=os.environ.get("SLACK_SIGNING_SECRET"),
+        )
         assert bot.karma == {}
-        for count in range(1,2):
+        for count in range(1, 2):
             msg = bot.increment_karma({"user": "foobar", "text": "@GraceHopper++"})
             assert f"GraceHopper now has {count} points." in msg
             assert "GraceHopper" in bot.karma
 
         assert "AdaLovelace" not in bot.karma
-        for count in range(1,2):
+        for count in range(1, 2):
             msg = bot.decrement_karma({"user": "foobar", "text": "@AdaLovelace--"})
             assert f"AdaLovelace now has -{count} points." in msg
             assert "AdaLovelace" in bot.karma

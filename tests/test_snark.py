@@ -36,5 +36,6 @@ class TestSnark(TestCase):
         assert msg
         assert msg in snark.negative_messages
 
+
 if __name__ == "__main__":
     unittest.main()
