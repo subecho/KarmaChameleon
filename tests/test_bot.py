@@ -17,6 +17,7 @@ Unit testing for the KarmaChameleon KarmaBot class.
 import os
 from unittest import TestCase
 from unittest import mock
+import json
 
 from karma_chameleon.bot import KarmaBot
 from karma_chameleon.karma_item import KarmaItem
@@ -136,4 +137,86 @@ class TestBot(TestCase):
             msg = bot.decrement_karma({"user": "foobar", "text": "@AdaLovelace--"})
             assert f"AdaLovelace now has -{count} points." in msg
             assert "AdaLovelace" in bot.karma
+
+        msg = bot.increment_karma({"user": "GraceHopper", "text": "@GraceHopper++"})
+        assert msg == "Ahem, no self-karma please!"
+        msg = bot.decrement_karma({"user": "GraceHopper", "text": "@GraceHopper--"})
+        assert msg == "Now, now.  Don't be so hard on yourself!"
+        self.cleanup()
+
+    @mock.patch("slack_sdk.WebClient.users_list")
+    def test_leaderboard(self, wc_users_list, _) -> None:
+        """Basic testing of the display_leaderboards functionality.
+
+        Arguments:
+        wc_users_list -- Mocked out version of the WebClient.client.users_list method.
+                         Populated
+                         by the @patch decorator.
+        """
+        wc_users_list.return_value = {
+            "ok": True,
+            "members": [
+                {
+                    "id": "U12345",
+                    "name": "Ada Lovelace",
+                },
+                {
+                    "id": "U67890",
+                    "name": "Grace Hopper",
+                },
+            ],
+        }
+        users_to_ids = {
+            "<@U12345>": "Ada Lovelace",
+            "<@U67890>": "Grace Hopper"
+        }
+
+        bot = KarmaBot(
+            token=os.environ.get("SLACK_BOT_TOKEN"),
+            signing_secret=os.environ.get("SLACK_SIGNING_SECRET"),
+        )
+
+        # Start by testing how an empty or missing karma file is handled.
+        msg, users_text, things_text = bot.display_karma_leaderboards()
+        assert msg == "No karma yet!" and users_text == "" and things_text == ""
+
+        # Begin by populating a karma test file.
+        test_items = [
+            "testA",
+            "testB",
+            "<@U12345>",
+            "<@U67890>",
+        ]
+        test_karma = [
+            (5, 0),
+            (6, 1),
+            (7, 2),
+            (8, 3),
+        ]
+        karmas = []
+        for i, item in enumerate(test_items):
+            karmas.append({"name": item, "pluses": 5 + i, "minuses": i})
+        with open(self.karma_file_path, "w") as json_file:
+            json.dump(karmas, json_file)
+
+        msg, users_text, things_text = bot.display_karma_leaderboards()
+        # Remove the trailling "```" from markdown syntax, then split by line,
+        # ignoring the first three lines which are header.
+        things_text = things_text[:-3].split("\n")[ 3:]
+        for item, karma, text in zip(test_items[:2], test_karma[:2], things_text):
+            found = [t.strip() for t in text.split('|') if t]
+            expected = [item, str(karma[0]), str(karma[1]), str(karma[0] - karma[1])]
+            assert found == expected
+
+        users_text = users_text[:-3].split("\n")[3:]
+        for item, karma, text in zip(test_items[2:], test_karma[2:], users_text):
+            found = [t.strip() for t in text.split('|') if t]
+            expected = [
+                users_to_ids[item],
+                str(karma[0]),
+                str(karma[1]),
+                str(karma[0] - karma[1])
+            ]
+            assert found == expected
+
         self.cleanup()

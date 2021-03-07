@@ -10,4 +10,4 @@ format:
 
 .PHONY: test
 test:
-	pytest
+	pytest --cov-report term-missing
