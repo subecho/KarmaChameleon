@@ -23,7 +23,8 @@ import karma_chameleon.snark as snark
 class TestSnark(TestCase):
     """Simple unit test class for exercising snark"""
 
-    def test_snark(self) -> None:
+    @staticmethod
+    def test_snark() -> None:
         """Verify get_positive_message and get_negative_message"""
         msg = snark.get_positive_message()
         assert msg

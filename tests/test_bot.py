@@ -174,8 +174,7 @@ class TestBot(TestCase):
         )
 
         # Start by testing how an empty or missing karma file is handled.
-        msg, users_text, things_text = bot.display_karma_leaderboards()
-        assert msg == "No karma yet!" and users_text == "" and things_text == ""
+        assert bot.display_karma_leaderboards() == ("No karma yet!", "", "")
 
         # Begin by populating a karma test file.
         test_items = [
@@ -190,13 +189,17 @@ class TestBot(TestCase):
             (7, 2),
             (8, 3),
         ]
-        karmas = []
-        for i, item in enumerate(test_items):
-            karmas.append({"name": item, "pluses": 5 + i, "minuses": i})
-        with open(self.karma_file_path, "w") as json_file:
-            json.dump(karmas, json_file)
 
-        msg, users_text, things_text = bot.display_karma_leaderboards()
+        with open(self.karma_file_path, "w") as json_file:
+            json.dump(
+                [
+                    {"name": item, "pluses": 5 + i, "minuses": i}
+                    for i, item in enumerate(test_items)
+                ],
+                json_file,
+            )
+
+        _, users_text, things_text = bot.display_karma_leaderboards()
         # Remove the trailling "```" from markdown syntax, then split by line,
         # ignoring the first three lines which are header.
         things_text = things_text[:-3].split("\n")[3:]
