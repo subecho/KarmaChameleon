@@ -73,11 +73,19 @@ class TestKarmaItem(TestCase):
         # Passing an object to KarmaItemEncoder which is not a KarmaItem should use the
         # parent JSONEncoder class instead.
         """Verify that JSON serialization works"""
-        result = json.dumps([], cls=KarmaItemEncoder)
-        assert result == "[]"
+        encoder = KarmaItemEncoder()
+        result = encoder.default(KarmaItem("foobarbaz", 9001, 10))
+        assert isinstance(result, dict)
+        assert result == {"name": "foobarbaz", "pluses": 9001, "minuses": 10}
 
-        json_str = json.dumps(KarmaItem("foobarbaz", 9001, 10), cls=KarmaItemEncoder)
-        assert json_str == '{"name": "foobarbaz", "pluses": 9001, "minuses": 10}'
+        # Pushing a dict through the KarmaItemEncoder should result in a TypeError being
+        # thrown from the parent JSONEncoder class.
+        failed = False
+        try:
+            encoder.default({"foo": "bar"})
+        except TypeError:
+            failed = True
+        assert failed
 
 
 if __name__ == "__main__":
