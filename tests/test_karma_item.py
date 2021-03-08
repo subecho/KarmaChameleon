@@ -19,6 +19,7 @@ import unittest
 from unittest import TestCase
 import json
 from karma_chameleon.karma_item import KarmaItem, KarmaItemEncoder
+from pdb import set_trace as pdb
 
 
 class TestKarmaItem(TestCase):
