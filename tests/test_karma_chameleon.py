@@ -1,18 +1,15 @@
-# Karma Chameleon
-# Copyright (C) 2021 Will Rideout
+# Karma Chameleon Copyright (C) 2021 Will Rideout
 #
-# This program is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
+# This program is free software: you can redistribute it and/or modify it under the terms
+# of the GNU General Public License as published by the Free Software Foundation, either
+# version 3 of the License, or (at your option) any later version.
 #
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
+# This program is distributed in the hope that it will be useful, but WITHOUT ANY
+# WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
+# PARTICULAR PURPOSE.  See the GNU General Public License for more details.
 #
-# You should have received a copy of the GNU General Public License
-# along with this program. If not, see <http://www.gnu.org/licenses/>.
+# You should have received a copy of the GNU General Public License along with this
+# program. If not, see <http://www.gnu.org/licenses/>.
 
 """
 Unit testing for the KarmaChameleon App proper.
@@ -36,7 +33,7 @@ with mock.patch.dict(
     },
 ):
     with mock.patch("slack_bolt.App._init_middleware_list"):
-        from karma_chameleon import (
+        from karma_chameleon.main import (
             handle_no_karma_op,
             increment,
             decrement,
@@ -45,7 +42,8 @@ with mock.patch.dict(
 
 
 class TestApp(TestCase):
-    """Class containing unit tests for the app functionality of the main karma_chameleon module."""
+    """Class containing unit tests for the app functionality of the main karma_chameleon
+    module."""
 
     callable_called = "next_method was called"
     test_msg = {"event": {"type": "message", "text": "foobarbaz"}}
@@ -58,16 +56,17 @@ class TestApp(TestCase):
         print(msg)
 
     class SpoofAck(Ack):  # pylint: disable=too-few-public-methods
-        """Child class of the Slack Bolt API Spoof class, which allows us to verify ack was called."""
+        """Child class of the Slack Bolt API Spoof class, which allows us to verify ack
+        was called."""
 
         ack_msg = "Ack was called!"
 
-        def __call__(self):  # pylint: disable=signature-differs
+        def __call__(self, **kwargs):  # pylint: disable=signature-differs
             print(self.ack_msg)
 
     def test_handle_no_karma_op(self) -> None:
-        """Test for verifying the behavior of the middleware which allows the kc bot to skip any
-        incoming event which does not contain a karma operation
+        """Test for verifying the behavior of the middleware which allows the kc bot to
+        skip any incoming event which does not contain a karma operation
         """
         # import karma_chameleon as kc # pylint: disable=import-outside-toplevel
 
@@ -99,7 +98,7 @@ class TestApp(TestCase):
             retval = handle_no_karma_op(body, self._next_method)
             assert verify_method(retval)
 
-    @mock.patch("bot.KarmaBot.increment_karma")
+    @mock.patch("karma_chameleon.bot.KarmaBot.increment_karma")
     def test_increment(self, app_inc_karma) -> None:
         """Test the method of the main app which calls the bot increment."""
         msg = "Got the message!"
@@ -110,7 +109,7 @@ class TestApp(TestCase):
             assert app_inc_karma.inc_karma.called_with(self.test_msg)
             assert out.getvalue() == msg + "\n"
 
-    @mock.patch("bot.KarmaBot.decrement_karma")
+    @mock.patch("karma_chameleon.bot.KarmaBot.decrement_karma")
     def test_decrement(self, app_dec_karma) -> None:
         """Test the method of the main app which calls the bot decrement."""
         msg = "Got the message!"
@@ -121,7 +120,7 @@ class TestApp(TestCase):
             assert app_dec_karma.inc_karma.called_with(self.test_msg)
             assert out.getvalue() == msg + "\n"
 
-    @mock.patch("bot.KarmaBot.display_karma_leaderboards")
+    @mock.patch("karma_chameleon.bot.KarmaBot.display_karma_leaderboards")
     def test_show_leaderboard(self, app_leaderboard):
         """Test the method of the main app which calls the bot leaderboard method."""
         ack = self.SpoofAck()
