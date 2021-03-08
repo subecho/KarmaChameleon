@@ -166,10 +166,7 @@ class TestBot(TestCase):
                 },
             ],
         }
-        users_to_ids = {
-            "<@U12345>": "Ada Lovelace",
-            "<@U67890>": "Grace Hopper"
-        }
+        users_to_ids = {"<@U12345>": "Ada Lovelace", "<@U67890>": "Grace Hopper"}
 
         bot = KarmaBot(
             token=os.environ.get("SLACK_BOT_TOKEN"),
@@ -202,20 +199,20 @@ class TestBot(TestCase):
         msg, users_text, things_text = bot.display_karma_leaderboards()
         # Remove the trailling "```" from markdown syntax, then split by line,
         # ignoring the first three lines which are header.
-        things_text = things_text[:-3].split("\n")[ 3:]
+        things_text = things_text[:-3].split("\n")[3:]
         for item, karma, text in zip(test_items[:2], test_karma[:2], things_text):
-            found = [t.strip() for t in text.split('|') if t]
+            found = [t.strip() for t in text.split("|") if t]
             expected = [item, str(karma[0]), str(karma[1]), str(karma[0] - karma[1])]
             assert found == expected
 
         users_text = users_text[:-3].split("\n")[3:]
         for item, karma, text in zip(test_items[2:], test_karma[2:], users_text):
-            found = [t.strip() for t in text.split('|') if t]
+            found = [t.strip() for t in text.split("|") if t]
             expected = [
                 users_to_ids[item],
                 str(karma[0]),
                 str(karma[1]),
-                str(karma[0] - karma[1])
+                str(karma[0] - karma[1]),
             ]
             assert found == expected
 
