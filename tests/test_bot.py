@@ -23,7 +23,6 @@ from slack_sdk.errors import SlackApiError
 from karma_chameleon.bot import KarmaBot
 from karma_chameleon.karma_item import KarmaItem
 
-from pdb import set_trace as pdb
 
 @mock.patch.dict(
     os.environ,
@@ -235,9 +234,7 @@ class TestBot(TestCase):
 
         with open(self.karma_file_path, "w") as json_file:
             json.dump(
-                [
-                    {"name": "foobar", "pluses": 9000, "minuses": 9000}
-                ],
+                [{"name": "foobar", "pluses": 9000, "minuses": 9000}],
                 json_file,
             )
 
