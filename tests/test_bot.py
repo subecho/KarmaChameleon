@@ -18,10 +18,12 @@ import os
 from unittest import TestCase
 from unittest import mock
 import json
+from slack_sdk.errors import SlackApiError
 
 from karma_chameleon.bot import KarmaBot
 from karma_chameleon.karma_item import KarmaItem
 
+from pdb import set_trace as pdb
 
 @mock.patch.dict(
     os.environ,
@@ -38,7 +40,7 @@ class TestBot(TestCase):
 
     # pylint: disable=protected-access
 
-    def cleanup(self):
+    def cleanup(self) -> None:
         """Clean up all state left over from invoking the KarmaBot class in each test"""
         if os.path.exists(self.karma_file_path):
             os.remove(self.karma_file_path)
@@ -219,4 +221,31 @@ class TestBot(TestCase):
             ]
             assert found == expected
 
+        self.cleanup()
+
+    @mock.patch("slack_sdk.WebClient")
+    def test_leaderboard_exceptions(self, web_client, _) -> None:
+        """Basic testing of the leaderboard method's ability to handle exceptions
+
+        Arguments:
+        web_client -- Mocked out version of the WebClient class.
+                      Populated by the @patch decorator
+        """
+        web_client.side_effect = SlackApiError("test error", None)
+
+        with open(self.karma_file_path, "w") as json_file:
+            json.dump(
+                [
+                    {"name": "foobar", "pluses": 9000, "minuses": 9000}
+                ],
+                json_file,
+            )
+
+        bot = KarmaBot(
+            token=os.environ.get("SLACK_BOT_TOKEN"),
+            signing_secret=os.environ.get("SLACK_SIGNING_SECRET"),
+        )
+
+        msg, user_text, thing_text = bot.display_karma_leaderboards()
+        assert not msg and not user_text and not thing_text
         self.cleanup()
