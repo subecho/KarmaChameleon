@@ -91,6 +91,38 @@ def handle_no_karma_op(
     # logger.debug("Ignoring event with no karma operation")
     return BoltResponse(status=200, body="Ignoring event with no karma operation")
 
+@app.command("/k")
+def handle_karma_command(ack: Ack, say: Say, command: dict) -> None:
+    """Trigger a karma event, either increment or decrement.  The format of the command is
+    as follows:
+
+        /k SUBJECT (++|--) trailing_garbage
+
+    The type of the karma event is determined by the use of "++" or "--" as indicated in
+    the above syntax.  Trailing garbage is any explanation or other flavor text the user
+    may provide in order to justify their awarding of karma, but it does nothing for this
+    bot so it is ignored.  The SUBJECT of a karma event may be either a username via the
+    "@" syntax of Slack, or an object.  Objects may be formatted as hashtags, but it
+    doesn't matter as the symbol is stripped anyway.
+
+    Arguments:
+    ack -- acknowledgement method, called to acknowledge the command was received
+    say -- method for printing back to the same channel from which the command was run
+    command -- dictionary specifying the command, including any text which was pased
+    """
+    event_type = command["text"].split()[1]
+
+    msg = {
+        "text": command["text"].split()[:2],
+        "user": command["user_id"],
+    }
+
+    if event_type == "++":
+        say(app.increment_karma(msg))
+    elif event_type == "--":
+        say(app.decrement_karma(msg))
+    else:
+        say("Hmmm... this doesn't look right.  Syntx is '/k SUBJECT (++|--) [FLAVOR]")
 
 @app.message(app.inc_regex)
 def increment(message: dict, say: Say) -> None:
