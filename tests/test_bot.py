@@ -130,13 +130,13 @@ class TestBot(TestCase):
         assert bot.karma == {}
         for count in range(1, 2):
             msg = bot.increment_karma({"user": "foobar", "text": "@GraceHopper++"})
-            assert f"GraceHopper now has {count} points." in msg
+            assert f"GraceHopper now has {count} points" in msg
             assert "GraceHopper" in bot.karma
 
         assert "AdaLovelace" not in bot.karma
         for count in range(1, 2):
             msg = bot.decrement_karma({"user": "foobar", "text": "@AdaLovelace--"})
-            assert f"AdaLovelace now has -{count} points." in msg
+            assert f"AdaLovelace now has -{count} points" in msg
             assert "AdaLovelace" in bot.karma
 
         msg = bot.increment_karma({"user": "GraceHopper", "text": "@GraceHopper++"})

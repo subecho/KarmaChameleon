@@ -80,9 +80,11 @@ class KarmaBot(App):
         If the token contains either a '#' or a '@', then that leading character is also
         stripped.
 
-        Arguments: msg -- text which contains a karma operation
+        Arguments:
+        msg -- text which contains a karma operation
 
-        Returns: Cleaned message
+        Returns:
+        Cleaned message
         """
         msg = msg["text"].split()[0]  # remove trailing garbage
         if msg[-2:] in ("++", "--"):
@@ -98,19 +100,36 @@ class KarmaBot(App):
         """
         return msg["user"] in msg["text"]
 
+    def get_username_from_uid(self, uid: str) -> str:
+        """Fetch the username corresponding to the passed UID string."""
+        if not uid:
+            return None
+
+        try:
+            client = WebClient(token=os.environ.get("SLACK_BOT_TOKEN"))
+            result = client.users_info(user=uid)
+            return result["user"]["real_name"]
+
+        except SlackApiError as e:
+            self.logger.error("Error fetching username for {}: {}".format(uid, e))
+            return None
+
     def increment_karma(self, msg: dict) -> str:
         """Increment karma for a passed item, and pass a corresponding message to the
         channel inside which the karma was bumped to be sent.
 
-        Arguments: msg -- text containing a karma event
+        Arguments:
+        msg -- text containing a karma event
 
-        Returns: A message to be sent back to the channel in which the karma event
-        occurred.
+        Returns:
+        A message to be sent back to the channel in which the karma event occurred.
         """
         self.logger.debug("Processing increment message.")
         if self._check_for_self_bump(msg):
             self.logger.debug("Skipping self-increment")
             return "Ahem, no self-karma please!"
+
+        tail = ", thanks to {}".format(self.get_username_from_uid(msg["user"]))
 
         item = self._clean_up_msg_text(msg)
         if not self.karma.get(item):
@@ -120,16 +139,21 @@ class KarmaBot(App):
         total = self.karma[item].total_score
         self._save_karma_to_json_file()
         self.logger.debug("Got increment for %s", item)
-        return f"{snark} {item} now has {total} points."
+        return f"{snark} {item} now has {total} points{tail}."
 
-    def decrement_karma(self, msg: dict) -> str:
+    def decrement_karma(self, msg: dict, user: str = None) -> str:
         """Decrement karma for a passed item, and pass a corresponding message to the
         channel inside which the karma was bumped to be sent.
 
-        Arguments: msg -- text containing a karma event
+        Arguments:
+        msg -- text containing a karma event
+        user -- UID specifying which user triggered the karma event.  If not None, then
+                the username string corresponding to this UID is fetched and printed.
+                This is to allow karma events triggered via the use of slash-commands to
+                show which user is responsible for the karma event.
 
-        Returns: A message to be sent back to the channel in which the karma event
-        occurred.
+        Returns:
+        A message to be sent back to the channel in which the karma event occurred.
         """
         self.logger.debug("Processing decrement message.")
         if self._check_for_self_bump(msg):
@@ -149,8 +173,9 @@ class KarmaBot(App):
     def display_karma_leaderboards(self) -> Tuple[str, str, str]:
         """Prints rudimentary user and thing leaderboards.
 
-        Returns A message, if applicable, a string representation of the user leaderboard,
-        and a string representation of the thing leaderboard.
+        Returns:
+        A message, if applicable, a string representation of the user leaderboard, and a
+        string representation of the thing leaderboard.
         """
         try:
             cur_karma = pd.read_json(self.karma_file_path)
