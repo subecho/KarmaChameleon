@@ -110,6 +110,7 @@ def handle_karma_command(ack: Ack, say: Say, command: dict) -> None:
     say -- method for printing back to the same channel from which the command was run
     command -- dictionary specifying the command, including any text which was pased
     """
+    ack()
     event_type = command["text"].split()[1]
 
     msg = {
