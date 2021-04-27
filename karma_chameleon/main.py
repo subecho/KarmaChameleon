@@ -55,6 +55,12 @@ app = KarmaBot(
     signing_secret=os.environ.get("SLACK_SIGNING_SECRET"),
 )
 
+@app.middleware
+def log_message(
+    body: dict, next: Callable # pylint: disable=redefined-builtin
+) -> Union[Callable, BoltResponse]: # pylint: disable=unsubscriptable-object
+    logger.debug("Received message: %s" % str(body))
+    return next()
 
 @app.middleware
 def handle_no_karma_op(
