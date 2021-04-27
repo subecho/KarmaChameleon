@@ -111,6 +111,7 @@ def handle_karma_command(ack: Ack, say: Say, command: dict) -> None:
     command -- dictionary specifying the command, including any text which was pased
     """
     ack()
+    print(command)
     event_type = command["text"].split()[1]
 
     msg = {
