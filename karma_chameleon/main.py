@@ -115,7 +115,7 @@ def handle_karma_command(ack: Ack, say: Say, command: dict) -> None:
     event_type = command["text"].split()[1]
 
     msg = {
-        "text": command["text"].split()[:2],
+        "text": command["text"],
         "user": command["user_id"],
     }
 
