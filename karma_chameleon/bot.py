@@ -103,6 +103,7 @@ class KarmaBot(App):
 
     def get_username_from_uid(self, uid:str) -> str:
         """Fetch the username corresponding to the passed UID string."""
+        print( "uid " + uid )
         if not uid:
             return None
 
@@ -135,6 +136,7 @@ class KarmaBot(App):
             self.logger.debug("Skipping self-increment")
             return "Ahem, no self-karma please!"
 
+        print(user)
         tail = ", thanks to {}".format(self.get_username_from_uid(user)) if user else None
 
         item = self._clean_up_msg_text(msg)
