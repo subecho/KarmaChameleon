@@ -117,16 +117,12 @@ class KarmaBot(App):
             return None
 
 
-    def increment_karma(self, msg: dict, user: str = None) -> str:
+    def increment_karma(self, msg: dict) -> str:
         """Increment karma for a passed item, and pass a corresponding message to the
         channel inside which the karma was bumped to be sent.
 
         Arguments:
         msg -- text containing a karma event
-        user -- UID specifying which user triggered the karma event.  If not None, then
-                the username string corresponding to this UID is fetched and printed.
-                This is to allow karma events triggered via the use of slash-commands to
-                show which user is responsible for the karma event.
 
         Returns:
         A message to be sent back to the channel in which the karma event occurred.
@@ -136,8 +132,8 @@ class KarmaBot(App):
             self.logger.debug("Skipping self-increment")
             return "Ahem, no self-karma please!"
 
-        print(user)
-        tail = ", thanks to {}".format(self.get_username_from_uid(user)) if user else None
+        print(msg)
+        tail = ", thanks to {}".format(self.get_username_from_uid(msg["user"]))
 
         item = self._clean_up_msg_text(msg)
         if not self.karma.get(item):
