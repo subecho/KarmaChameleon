@@ -103,6 +103,9 @@ class KarmaBot(App):
 
     def get_username_from_uid(self, uid:str) -> str:
         """Fetch the username corresponding to the passed UID string."""
+        if not uid:
+            return None
+
         try:
             client = WebClient(token=os.environ.get("SLACK_BOT_TOKEN"))
             result = client.users_info(user=uid)
@@ -127,11 +130,12 @@ class KarmaBot(App):
         Returns:
         A message to be sent back to the channel in which the karma event occurred.
         """
-        print(msg)
         self.logger.debug("Processing increment message.")
         if self._check_for_self_bump(msg):
             self.logger.debug("Skipping self-increment")
             return "Ahem, no self-karma please!"
+
+        tail = ", thanks to {}".format(self.get_username_from_uid(user)) if user else None
 
         item = self._clean_up_msg_text(msg)
         if not self.karma.get(item):
@@ -141,7 +145,7 @@ class KarmaBot(App):
         total = self.karma[item].total_score
         self._save_karma_to_json_file()
         self.logger.debug("Got increment for %s", item)
-        return f"{snark} {item} now has {total} points."
+        return f"{snark} {item} now has {total} points{tail}."
 
     def decrement_karma(self, msg: dict, user: str = None) -> str:
         """Decrement karma for a passed item, and pass a corresponding message to the
