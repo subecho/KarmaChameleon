@@ -103,13 +103,13 @@ class KarmaBot(App):
 
     def get_username_from_uid(self, uid:str) -> str:
         """Fetch the username corresponding to the passed UID string."""
-        print( "uid " + uid )
         if not uid:
             return None
 
         try:
             client = WebClient(token=os.environ.get("SLACK_BOT_TOKEN"))
             result = client.users_info(user=uid)
+            print(result)
             return result["name"]
 
         except SlackApiError as e:
@@ -132,7 +132,6 @@ class KarmaBot(App):
             self.logger.debug("Skipping self-increment")
             return "Ahem, no self-karma please!"
 
-        print(msg)
         tail = ", thanks to {}".format(self.get_username_from_uid(msg["user"]))
 
         item = self._clean_up_msg_text(msg)
