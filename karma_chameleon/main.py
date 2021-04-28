@@ -125,9 +125,9 @@ def handle_karma_command(ack: Ack, say: Say, command: dict) -> None:
     }
 
     if event_type == "++":
-        say(app.increment_karma(msg, user=uid))
+        say(app.increment_karma(msg))
     elif event_type == "--":
-        say(app.decrement_karma(msg, user=uid))
+        say(app.decrement_karma(msg))
     else:
         say("Hmmm... this doesn't look right.  Syntx is '/k SUBJECT (++|--) [FLAVOR]")
 
