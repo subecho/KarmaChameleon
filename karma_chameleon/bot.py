@@ -93,6 +93,7 @@ class KarmaBot(App):
             msg = msg[1:]
         return msg
 
+
     @staticmethod
     def _check_for_self_bump(msg: dict) -> bool:
         """Returns true if the passed message text contains a self-bump, i.e. the sending
@@ -100,7 +101,9 @@ class KarmaBot(App):
         """
         return msg["user"] in msg["text"]
 
+
     def get_username_from_uid(self, uid: str) -> str:
+
         """Fetch the username corresponding to the passed UID string."""
         if not uid:
             return None
@@ -113,6 +116,7 @@ class KarmaBot(App):
         except SlackApiError as e:
             self.logger.error("Error fetching username for {}: {}".format(uid, e))
             return None
+
 
     def increment_karma(self, msg: dict) -> str:
         """Increment karma for a passed item, and pass a corresponding message to the
