@@ -110,7 +110,7 @@ class KarmaBot(App):
             client = WebClient(token=os.environ.get("SLACK_BOT_TOKEN"))
             result = client.users_info(user=uid)
             print(result)
-            return result["name"]
+            return result["user"]["name"]
 
         except SlackApiError as e:
             self.logger.error("Error fetching username for {}: {}".format(uid, e))
