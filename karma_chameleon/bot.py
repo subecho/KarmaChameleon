@@ -122,14 +122,14 @@ class KarmaBot(App):
         msg -- text containing a karma event
 
         Returns:
-        A message to be sent back to the channel in which the karma event occurred.
+        The message to be sent back to the channel in which the karma event occurred.
         """
         self.logger.debug("Processing increment message.")
         if self._check_for_self_bump(msg):
             self.logger.debug("Skipping self-increment")
             return "Ahem, no self-karma please!"
 
-        tail = ", thanks to {}".format(self.get_username_from_uid(msg["user"]))
+        tail = f", thanks to {self.get_username_from_uid(msg["user"])}."
 
         item = self._clean_up_msg_text(msg)
         if not self.karma.get(item):

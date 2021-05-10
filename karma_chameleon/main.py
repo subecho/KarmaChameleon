@@ -139,7 +139,7 @@ def increment(message: dict, say: Say) -> None:
 
     Arguments:
     message -- dictionary representation of the message which contains a karma operation
-    say -- method for printing back to the same channel from which the command was run
+    say -- The method for outputting the response to the channel from which the command was run.
     """
     rsp = app.increment_karma(message)
     say(rsp)
@@ -151,8 +151,8 @@ def decrement(message: dict, say: Say) -> None:
     on the return value of the bot's decrement method.
 
     Arguments:
-    message -- dictionary representation of the message which contains a karma operation
-    say -- method for printing back to the same channel from which the command was run
+    message -- The message which contains a karma operation.
+    say -- The method for outputting the response to the channel from which the command was run.
     """
     rsp = app.decrement_karma(message)
     say(rsp)
@@ -163,8 +163,8 @@ def show_leaderboard(ack: Ack, say: Say) -> None:
     """Invoke leaderboard display from the karmaChameleon bot.
 
     Arguments:
-    ack -- acknowledgement method, called to acknowledge the command was received
-    say -- method for printing back to the same channel from which the command was run
+    ack -- Method to be called to acknowledge that the command was received.
+    say -- Method to be called for outputting to the same channel from which the command was run.
     """
     # Must acknowledge the command was run.
     ack()
