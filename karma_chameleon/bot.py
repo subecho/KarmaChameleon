@@ -123,7 +123,7 @@ class KarmaBot(App):
         msg -- text containing a karma event
 
         Returns:
-        A message to be sent back to the channel in which the karma event occurred.
+        The message to be sent back to the channel in which the karma event occurred.
         """
         self.logger.debug("Processing increment message.")
         if self._check_for_self_bump(msg):
