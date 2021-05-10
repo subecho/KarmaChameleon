@@ -164,7 +164,7 @@ def show_leaderboard(ack: Ack, say: Say) -> None:
 
     Arguments:
     ack -- acknowledgement method, called to acknowledge the command was received
-    say -- method for printing back to the same channel from which the command was run
+    say -- Method to be called for outputting to the same channel from which the command was run.
     """
     # Must acknowledge the command was run.
     ack()
