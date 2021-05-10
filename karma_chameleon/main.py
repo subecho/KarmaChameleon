@@ -163,7 +163,7 @@ def show_leaderboard(ack: Ack, say: Say) -> None:
     """Invoke leaderboard display from the karmaChameleon bot.
 
     Arguments:
-    ack -- acknowledgement method, called to acknowledge the command was received
+    ack -- Method to be called to acknowledge that the command was received.
     say -- Method to be called for outputting to the same channel from which the command was run.
     """
     # Must acknowledge the command was run.
