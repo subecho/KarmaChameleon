@@ -152,7 +152,7 @@ def decrement(message: dict, say: Say) -> None:
 
     Arguments:
     message -- dictionary representation of the message which contains a karma operation
-    say -- method for printing back to the same channel from which the command was run
+    say -- The method for outputting the response to the channel from which the command was run.
     """
     rsp = app.decrement_karma(message)
     say(rsp)
