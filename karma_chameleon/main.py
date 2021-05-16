@@ -55,12 +55,14 @@ app = KarmaBot(
     signing_secret=os.environ.get("SLACK_SIGNING_SECRET"),
 )
 
+
 @app.middleware
 def log_message(
-    body: dict, next: Callable # pylint: disable=redefined-builtin
-) -> Union[Callable, BoltResponse]: # pylint: disable=unsubscriptable-object
+    body: dict, next: Callable  # pylint: disable=redefined-builtin
+) -> Union[Callable, BoltResponse]:  # pylint: disable=unsubscriptable-object
     logger.debug("Received message: %s" % str(body))
     return next()
+
 
 @app.middleware
 def handle_no_karma_op(
@@ -72,12 +74,14 @@ def handle_no_karma_op(
     Unfortunately the Slack Bolt API requires that the next middleware method be referred
     to as "next", which is a built-in.  You can't win them all I suppose...
 
-    Arguments: body -- a dict containing the entire Slack Bolt API event next_middleware
-    -- callable reference to the next middleware listener.
+    Arguments:
+    body -- a dict containing the entire Slack Bolt API event
+    next -- callable reference to the next middleware listener.
 
-    Returns: If the incoming event contains a karma operation, then the next middleware
-    listener is returned and invoked by the caller of this middleware.  If there is no
-    karma operation contained in the event, and the event is not a command, then a
+    Returns:
+    If the incoming event contains a karma operation, then the next middleware listener
+    is returned and invoked by the caller of this middleware.  If there is no karma
+    operation contained in the event, and the event is not a command, then a
     BoltResponse(200) is returned as we have nothing further to do.
     """
     if body.get("command"):
@@ -92,14 +96,50 @@ def handle_no_karma_op(
     return BoltResponse(status=200, body="Ignoring event with no karma operation")
 
 
+@app.command("/k")
+def handle_karma_command(ack: Ack, say: Say, command: dict) -> None:
+    """Trigger a karma event, either increment or decrement.  The format of the command is
+    as follows:
+
+        /k SUBJECT (++|--) trailing_garbage
+
+    The type of the karma event is determined by the use of "++" or "--" as indicated in
+    the above syntax.  Trailing garbage is any explanation or other flavor text the user
+    may provide in order to justify their awarding of karma, but it does nothing for this
+    bot so it is ignored.  The SUBJECT of a karma event may be either a username via the
+    "@" syntax of Slack, or an object.  Objects may be formatted as hashtags, but it
+    doesn't matter as the symbol is stripped anyway.
+
+    Arguments:
+    ack -- acknowledgement method, called to acknowledge the command was received
+    say -- method for printing back to the same channel from which the command was run
+    command -- dictionary specifying the command, including any text which was pased
+    """
+    ack()
+    event_type = command["text"].split()[1]
+    uid = command["user_id"]
+
+    msg = {
+        "text": command["text"],
+        "user": uid,
+    }
+
+    if event_type == "++":
+        say(app.increment_karma(msg))
+    elif event_type == "--":
+        say(app.decrement_karma(msg))
+    else:
+        say("Hmmm... this doesn't look right.  Syntx is '/k SUBJECT (++|--) [FLAVOR]")
+
+
 @app.message(app.inc_regex)
 def increment(message: dict, say: Say) -> None:
     """Passes the message along for to the KarmaChameleon bot, then posts a response based
     on the return value of the bot's increment method.
 
-    Arguments: message -- dictionary representation of the message which contains a karma
-    operation say -- method for printing back to the same channel from which the command
-    was run
+    Arguments:
+    message -- dictionary representation of the message which contains a karma operation
+    say -- The method for outputting the response to the channel from which the command was run.
     """
     rsp = app.increment_karma(message)
     say(rsp)
@@ -110,9 +150,9 @@ def decrement(message: dict, say: Say) -> None:
     """Passes the message along for to the KarmaChameleon bot, then posts a response based
     on the return value of the bot's decrement method.
 
-    Arguments: message -- dictionary representation of the message which contains a karma
-    operation say -- method for printing back to the same channel from which the command
-    was run
+    Arguments:
+    message -- The message which contains a karma operation.
+    say -- The method for outputting the response to the channel from which the command was run.
     """
     rsp = app.decrement_karma(message)
     say(rsp)
@@ -122,9 +162,9 @@ def decrement(message: dict, say: Say) -> None:
 def show_leaderboard(ack: Ack, say: Say) -> None:
     """Invoke leaderboard display from the karmaChameleon bot.
 
-    Arguments: ack -- acknowledgement method, called to acknowledge the command was
-    received say -- method for printing back to the same channel from which the command
-    was run
+    Arguments:
+    ack -- Method to be called to acknowledge that the command was received.
+    say -- Method to be called for outputting to the same channel from which the command was run.
     """
     # Must acknowledge the command was run.
     ack()
