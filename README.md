@@ -53,6 +53,9 @@ will need to create a new app in Slack and add the following scopes:
 - commands
 - users:read
 
+**App-Level Tokens Scopes:**
+- connections:write
+
 **User Token Scopes:**
 - channels:history
 
@@ -64,12 +67,10 @@ The following environment variables must be present in order for Karma Chameleon
 function:
 - `SLACK_BOT_TOKEN`: populated with the contents of the SLACK_BOT_TOKEN OAuth key in the
   Slack App OAuth settings
-- `SLACK_SIGNING_SECRET`: populated with the Signing Secret key found in the Slack App
-  Basic Information settings.
+- `SLACK_APP_TOKEN`: populated with the contents of an App-Level Token specifically
+  generated for use with socket mode, which may be found in Slack App Basic Information
 - `KARMA_FILE_PATH`: the path to which Karma Chameleon will create and maintain a JSON
   record of all karma.
-- `PORT`: port via which Karma Chameleon and Slack will communicate.  This is optional and
-  has a default value of 3000
 
 In one terminal window, run: `python3 karma_chameleon.py`
 

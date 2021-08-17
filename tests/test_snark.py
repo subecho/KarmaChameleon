@@ -17,7 +17,7 @@ Unit testing for the KarmaChameleon snark.
 
 import unittest
 from unittest import TestCase
-import karma_chameleon.snark as snark
+from karma_chameleon import snark
 
 
 class TestSnark(TestCase):

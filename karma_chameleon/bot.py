@@ -37,8 +37,8 @@ class KarmaBot(App):
     changes to the same.
     """
 
-    def __init__(self, token: str, signing_secret: str) -> None:
-        super().__init__(token=token, signing_secret=signing_secret)
+    def __init__(self, token: str) -> None:
+        super().__init__(token=token)
 
         self.karma = {}
         self.karma_file_path = os.environ.get("KARMA_FILE_PATH")
@@ -110,8 +110,8 @@ class KarmaBot(App):
             result = client.users_info(user=uid)
             return result["user"]["real_name"]
 
-        except SlackApiError as e:
-            self.logger.error("Error fetching username for {}: {}".format(uid, e))
+        except SlackApiError as err:
+            self.logger.error("Error fetching username for %s: %s", uid, err)
             return None
 
     def increment_karma(self, msg: dict) -> str:
