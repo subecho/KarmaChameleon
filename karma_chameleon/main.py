@@ -183,4 +183,4 @@ def show_leaderboard(ack: Ack, say: Say) -> None:
 
 
 if __name__ == "__main__":
-    SocketModeHandler(app, os.environ["SLACK_BOT_TOKEN"]).start()
+    SocketModeHandler(app, os.environ["SLACK_APP_TOKEN"]).start()
