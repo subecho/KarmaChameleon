@@ -68,7 +68,7 @@ function:
 - `SLACK_BOT_TOKEN`: populated with the contents of the SLACK_BOT_TOKEN OAuth key in the
   Slack App OAuth settings
 - `SLACK_APP_TOKEN`: populated with the contents of an App-Level Token specifically
-  generated for use with socket mode, whihc may be found in Slack App Basic Information
+  generated for use with socket mode, which may be found in Slack App Basic Information
 - `KARMA_FILE_PATH`: the path to which Karma Chameleon will create and maintain a JSON
   record of all karma.
 
