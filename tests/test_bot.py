@@ -28,9 +28,7 @@ from karma_chameleon.karma_item import KarmaItem
     os.environ,
     {
         "SLACK_BOT_TOKEN": "xoxb-12345-67890-deadbeef",
-        "SLACK_SIGNING_SECRET": "1234567890deadbeef",
         "KARMA_FILE_PATH": "/tmp/karma",
-        "PORT": "3000",
     },
 )
 @mock.patch("slack_bolt.App._init_middleware_list")
@@ -56,7 +54,6 @@ class TestBot(TestCase):
         assert not os.path.exists(self.karma_file_path)
         bot = KarmaBot(
             token=os.environ.get("SLACK_BOT_TOKEN"),
-            signing_secret=os.environ.get("SLACK_SIGNING_SECRET"),
         )
         assert os.path.exists(self.karma_file_path)
         assert bot.karma == {}
@@ -94,7 +91,6 @@ class TestBot(TestCase):
         ]
         bot = KarmaBot(
             token=os.environ.get("SLACK_BOT_TOKEN"),
-            signing_secret=os.environ.get("SLACK_SIGNING_SECRET"),
         )
         for case in cases:
             exp_return_val, text = case
@@ -112,7 +108,6 @@ class TestBot(TestCase):
         ]
         bot = KarmaBot(
             token=os.environ.get("SLACK_BOT_TOKEN"),
-            signing_secret=os.environ.get("SLACK_SIGNING_SECRET"),
         )
 
         for case in cases:
@@ -125,7 +120,6 @@ class TestBot(TestCase):
         """Test KarmaBot increment and decrement functionality"""
         bot = KarmaBot(
             token=os.environ.get("SLACK_BOT_TOKEN"),
-            signing_secret=os.environ.get("SLACK_SIGNING_SECRET"),
         )
         assert bot.karma == {}
         for count in range(1, 2):
@@ -171,7 +165,6 @@ class TestBot(TestCase):
 
         bot = KarmaBot(
             token=os.environ.get("SLACK_BOT_TOKEN"),
-            signing_secret=os.environ.get("SLACK_SIGNING_SECRET"),
         )
 
         # Start by testing how an empty or missing karma file is handled.
@@ -240,7 +233,6 @@ class TestBot(TestCase):
 
         bot = KarmaBot(
             token=os.environ.get("SLACK_BOT_TOKEN"),
-            signing_secret=os.environ.get("SLACK_SIGNING_SECRET"),
         )
 
         msg, user_text, thing_text = bot.display_karma_leaderboards()

@@ -27,9 +27,7 @@ with mock.patch.dict(
     os.environ,
     {
         "SLACK_BOT_TOKEN": "xoxb-12345-67890-deadbeef",
-        "SLACK_SIGNING_SECRET": "1234567890deadbeef",
         "KARMA_FILE_PATH": "/tmp/karma",
-        "PORT": "3000",
     },
 ):
     with mock.patch("slack_bolt.App._init_middleware_list"):
