@@ -101,6 +101,25 @@ class KarmaBot(App):
         """
         return msg["user"] in msg["text"]
 
+    @staticmethod
+    def _check_for_url(msg: dict) -> bool:
+        """Returns true if the passed message text contains the ++ or -- token as part of
+        a larger URL stirng.
+
+        The URL regex is shamlessly copied from https://urlregex.com/.
+        """
+        url_re = re.compile(
+            r"http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|"
+            r"(?:%[0-9a-fA-F][0-9a-fA-F]))+"
+        )
+
+        for word in msg["text"].split():
+            # As of the writing of this code, "++" is not able to be included, unencoded,
+            # in a URL.
+            if "--" in word:
+                return re.match(url_re, word) is not None
+        return False
+
     def get_username_from_uid(self, uid: str) -> str:
         """Fetch the username corresponding to the passed UID string."""
         if not uid:
@@ -156,6 +175,9 @@ class KarmaBot(App):
         if self._check_for_self_bump(msg):
             self.logger.debug("Skipping self-decrement")
             return "Now, now.  Don't be so hard on yourself!"
+
+        if self._check_for_url(msg):
+            return ""  # Fail silently... no need to respond to the user.
 
         item = self._clean_up_msg_text(msg)
         if not self.karma.get(item):

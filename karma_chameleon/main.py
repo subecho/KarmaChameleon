@@ -127,9 +127,12 @@ def handle_karma_command(ack: Ack, say: Say, command: dict) -> None:
     }
 
     if event_type == "++":
-        say(app.increment_karma(msg))
+        rsp = app.increment_karma(msg)
+        say(rsp)
     elif event_type == "--":
-        say(app.decrement_karma(msg))
+        rsp = app.decrement_karma(msg)
+        if rsp:
+            say(rsp)
     else:
         say("Hmmm... this doesn't look right.  Syntx is '/k SUBJECT (++|--) [FLAVOR]")
 
@@ -159,7 +162,8 @@ def decrement(message: dict, say: Say) -> None:
     was run.
     """
     rsp = app.decrement_karma(message)
-    say(rsp)
+    if rsp:
+        say(rsp)
 
 
 @app.command("/leaderboard")
