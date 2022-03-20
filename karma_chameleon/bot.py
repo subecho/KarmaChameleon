@@ -105,7 +105,7 @@ class KarmaBot(App):
         """Returns true if the passed message text contains the ++ or -- token as part of
         a larger URL stirng.
 
-        The URL regex is shamlessly copied from https://urlregex.com/.
+        The URL regex is shamelessly copied from https://urlregex.com/.
         """
         url_re = re.compile(
             r"http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|"
