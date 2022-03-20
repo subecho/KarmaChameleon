@@ -116,6 +116,22 @@ class TestBot(TestCase):
 
         self.cleanup()
 
+    def test_detect_url(self, _) -> None:
+        """Test the ability of KarmnaBot to detect a URL which contains either the ++ or
+        -- tokens.
+        """
+        cases = [
+            (True, {"user": "GraceHopper", "text": "http://www.example--.com"}),
+            (False, {"user": "GraceHopper", "text": "http://www.example.com"}),
+        ]
+        bot = KarmaBot(
+            token=os.environ.get("SLACK_BOT_TOKEN"),
+        )
+
+        for case in cases:
+            exp_return_value, event = case
+            assert bot._check_for_url(event) == exp_return_value
+
     def test_increment_and_decrement(self, _) -> None:
         """Test KarmaBot increment and decrement functionality"""
         bot = KarmaBot(

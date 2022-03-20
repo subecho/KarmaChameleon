@@ -110,13 +110,24 @@ class TestApp(TestCase):
     @mock.patch("karma_chameleon.bot.KarmaBot.decrement_karma")
     def test_decrement(self, app_dec_karma) -> None:
         """Test the method of the main app which calls the bot decrement."""
-        msg = "Got the message!"
+        for msg in ["Got the message!", ""]:
+            app_dec_karma.return_value = msg
+
+            with contextlib.redirect_stdout(io.StringIO()) as out:
+                decrement(self.test_msg, self._say_method)
+                assert app_dec_karma.inc_karma.called_with(self.test_msg)
+                assert out.getvalue() == (msg + "\n" if msg else msg)
+
+    @mock.patch("karma_chameleon.bot.KarmaBot.decrement_karma")
+    def test_decrement_no_msg(self, app_dec_karma) -> None:
+        """Test the method of the main app which calls the bot decrement."""
+        msg = ""
         app_dec_karma.return_value = msg
 
         with contextlib.redirect_stdout(io.StringIO()) as out:
             decrement(self.test_msg, self._say_method)
             assert app_dec_karma.inc_karma.called_with(self.test_msg)
-            assert out.getvalue() == msg + "\n"
+            assert out.getvalue() == msg
 
     @mock.patch("karma_chameleon.bot.KarmaBot.display_karma_leaderboards")
     def test_show_leaderboard(self, app_leaderboard):
