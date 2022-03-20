@@ -59,10 +59,10 @@ class KarmaBot(App):
         karma_file = Path(self.karma_file_path)
         if not karma_file.is_file():
             self.logger.debug("No existing karma file found. Will start fresh.")
-            with open(self.karma_file_path, "w") as file_ptr:
+            with open(self.karma_file_path, "w", encoding="utf-8") as file_ptr:
                 file_ptr.write("[]")
             return
-        with open(self.karma_file_path, "r") as file_ptr:
+        with open(self.karma_file_path, "r", encoding="utf-8") as file_ptr:
             karma_list = json.load(file_ptr, object_hook=KarmaItem.dict_to_karmaitem)
         for item in karma_list:
             self.karma[item.name] = item
@@ -70,7 +70,7 @@ class KarmaBot(App):
     def _save_karma_to_json_file(self) -> None:
         self.logger.debug("Saving karma JSON to file %s", self.karma_file_path)
         karma_list = list(self.karma.values())
-        with open(self.karma_file_path, "w") as file_ptr:
+        with open(self.karma_file_path, "w", encoding="utf-8") as file_ptr:
             json.dump(karma_list, file_ptr, cls=KarmaItemEncoder)
 
     @staticmethod
@@ -99,6 +99,25 @@ class KarmaBot(App):
         username is also present in the text as the karma target.
         """
         return msg["user"] in msg["text"]
+
+    @staticmethod
+    def _check_for_url(msg: dict) -> bool:
+        """Returns true if the passed message text contains the ++ or -- token as part of
+        a larger URL stirng.
+
+        The URL regex is shamlessly copied from https://urlregex.com/.
+        """
+        url_re = re.compile(
+            r"http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|"
+            r"(?:%[0-9a-fA-F][0-9a-fA-F]))+"
+        )
+
+        for word in msg["text"].split():
+            # As of the writing of this code, "++" is not able to be included, unencoded,
+            # in a URL.
+            if "--" in word:
+                return re.match(url_re, word) is not None
+        return False
 
     def get_username_from_uid(self, uid: str) -> str:
         """Fetch the username corresponding to the passed UID string."""
@@ -155,6 +174,9 @@ class KarmaBot(App):
         if self._check_for_self_bump(msg):
             self.logger.debug("Skipping self-decrement")
             return "Now, now.  Don't be so hard on yourself!"
+
+        if self._check_for_url(msg):
+            return ""  # Fail silently... no need to respond to the user.
 
         item = self._clean_up_msg_text(msg)
         if not self.karma.get(item):
