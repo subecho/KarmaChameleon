@@ -134,7 +134,7 @@ def handle_karma_command(ack: Ack, say: Say, command: dict) -> None:
         if rsp:
             say(rsp)
     else:
-        say("Hmmm... this doesn't look right.  Syntx is '/k SUBJECT (++|--) [FLAVOR]")
+        say("Hmmm... this doesn't look right.  Syntax is '/k SUBJECT (++|--) [FLAVOR]")
 
 
 @app.message(app.inc_regex)
