@@ -102,8 +102,8 @@ class KarmaBot(App):
 
     @staticmethod
     def _check_for_url(msg: dict) -> bool:
-        """Returns true if the passed message text contains the ++ or -- token as part of
-        a larger URL stirng.
+        """Returns True if the passed message text contains the or -- token as part of a
+        larger URL stirng.
 
         The URL regex is shamelessly copied from https://urlregex.com/.
         """

@@ -58,7 +58,7 @@ class TestBot(TestCase):
         assert os.path.exists(self.karma_file_path)
         assert bot.karma == {}
 
-        with open(self.karma_file_path, "w") as file_ptr:
+        with open(self.karma_file_path, "w", encoding="utf-8") as file_ptr:
             file_ptr.write('[{"name": "foobar", "pluses": 1, "minuses": 1}]')
 
         bot._load_karma_from_json_file()
@@ -68,7 +68,7 @@ class TestBot(TestCase):
 
         bot.karma["baz"] = KarmaItem("baz", 10, 10)
         bot._save_karma_to_json_file()
-        with open(self.karma_file_path, "r") as file_ptr:
+        with open(self.karma_file_path, "r", encoding="utf-8") as file_ptr:
             lines = file_ptr.readline()
             assert "baz" in lines
 
@@ -117,8 +117,8 @@ class TestBot(TestCase):
         self.cleanup()
 
     def test_detect_url(self, _) -> None:
-        """Test the ability of KarmnaBot to detect a URL which contains either the ++ or
-        -- tokens.
+        """Test the ability of KarmnaBot to detect a URL which contains either the -- 
+        token.
         """
         cases = [
             (True, {"user": "GraceHopper", "text": "https://www.example--.com"}),
@@ -200,7 +200,7 @@ class TestBot(TestCase):
             (8, 3),
         ]
 
-        with open(self.karma_file_path, "w") as json_file:
+        with open(self.karma_file_path, "w", encoding="utf-8") as json_file:
             json.dump(
                 [
                     {"name": item, "pluses": 5 + i, "minuses": i}
@@ -241,7 +241,7 @@ class TestBot(TestCase):
         """
         web_client.side_effect = SlackApiError("test error", None)
 
-        with open(self.karma_file_path, "w") as json_file:
+        with open(self.karma_file_path, "w", encoding="utf-8") as json_file:
             json.dump(
                 [{"name": "foobar", "pluses": 9000, "minuses": 9000}],
                 json_file,
