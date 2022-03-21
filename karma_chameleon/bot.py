@@ -206,8 +206,6 @@ class KarmaBot(App):
         except ValueError:  # Empty file or no file present
             self.logger.exception("Empty karma file or no file present, return.")
             return ("No karma yet!", "", "")
-        except KeyError:
-            print("DEBUG" + ", ".join(k for k in cur_karma))
 
         try:
             # Add @here, @everyone, and @channel to the user list. Specific channels can
