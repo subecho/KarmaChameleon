@@ -68,7 +68,7 @@ class TestBot(TestCase):
 
         bot.karma["baz"] = KarmaItem("baz", 10, 10)
         bot._save_karma_to_json_file()
-        with open(self.karma_file_path, "r") as file_ptr:
+        with open(self.karma_file_path, "r", encoding="utf-8") as file_ptr:
             lines = file_ptr.readline()
             assert "baz" in lines
 

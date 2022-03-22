@@ -60,10 +60,10 @@ class KarmaBot(App):
         karma_file = Path(self.karma_file_path)
         if not karma_file.is_file():
             self.logger.debug("No existing karma file found. Will start fresh.")
-            with open(self.karma_file_path, "w") as file_ptr:
+            with open(self.karma_file_path, "w", encoding="utf-8") as file_ptr:
                 file_ptr.write("[]")
             return
-        with open(self.karma_file_path, "r") as file_ptr:
+        with open(self.karma_file_path, "r", encoding="utf-8") as file_ptr:
             karma_list = json.load(file_ptr, object_hook=KarmaItem.dict_to_karmaitem)
         for item in karma_list:
             self.karma[item.name] = item
@@ -71,7 +71,7 @@ class KarmaBot(App):
     def _save_karma_to_json_file(self) -> None:
         self.logger.debug("Saving karma JSON to file %s", self.karma_file_path)
         karma_list = list(self.karma.values())
-        with open(self.karma_file_path, "w") as file_ptr:
+        with open(self.karma_file_path, "w", encoding="utf-8") as file_ptr:
             json.dump(karma_list, file_ptr, cls=KarmaItemEncoder)
 
     @staticmethod
@@ -176,25 +176,25 @@ class KarmaBot(App):
         """
         Row = namedtuple("Row", "name pluses minuses net_score")
         try:
-            with open(self.karma_file_path, "r", encoding="utf-8") as f:
-                cur_karma = json.load(f)
+            with open(self.karma_file_path, "r", encoding="utf-8") as karma_file:
+                cur_karma = json.load(karma_file)
 
             user_table = []
             thing_table = []
             for item in cur_karma:
                 name = item["name"]
-                delta = item["pluses"] - item["minuses"]
-                row = Row(name, item["pluses"], item["minuses"], delta)
+                pluses = item["pluses"]
+                minuses = item["minuses"]
+                delta = pluses - minuses
 
                 if name.startswith("<@"):
                     name = name.lstrip("<@").rstrip(">")
-                    user_table.append(row)
+                    user_table.append(Row(name, pluses, minuses, delta))
                 elif name.startswith("<!"):  # Special case for @everyone, @channel, @here
                     name = name.lstrip("<!").rstrip(">")
-                    row.name = name
-                    user_table.append(row)
+                    user_table.append(Row(name, pluses, minuses, delta))
                 else:
-                    thing_table.append(row)
+                    thing_table.append(Row(name, pluses, minuses, delta))
         except ValueError:  # Empty file or no file present
             self.logger.exception("Empty karma file or no file present, return.")
             return ("No karma yet!", "", "")
