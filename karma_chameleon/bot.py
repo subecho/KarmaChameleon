@@ -222,8 +222,8 @@ class KarmaBot(App):
                 else:
                     usr_table.append(row)
 
-            usr_table = sorted(usr_table, key=lambda x: x.net_score)[:10]
-            thing_table = sorted(thing_table, key=lambda x: x.net_score)[:10]
+            usr_table = sorted(usr_table, reverse=True, key=lambda x: x.net_score)[:10]
+            thing_table = sorted(thing_table, reverse=True, key=lambda x: x.net_score)[:10]
 
             headers = ["Name", "Pluses", "Minuses", "Net Score"]
             users = tabulate([list(row) for row in usr_table], headers, tablefmt="github")
