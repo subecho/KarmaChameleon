@@ -206,7 +206,7 @@ class KarmaBot(App):
             if request["ok"]:
                 for member in request["members"]:
                     self.logger.debug("WRIDEOUT member" + str(member))
-                    ids_to_names[member["id"]] = member["display_name"]
+                    ids_to_names[member["id"]] = member["real_name"] or member["name"]
 
             # Convert user IDs to actual names
             usr_table = []
