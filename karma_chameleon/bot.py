@@ -177,7 +177,7 @@ class KarmaBot(App):
             return "Now, now.  Don't be so hard on yourself!"
 
         if self._check_for_url(msg):
-            return ""  # Fail silently... no need to respond to the user.
+            return None  # Fail silently... no need to respond to the user.
 
         item = self._clean_up_msg_text(msg)
         if not self.karma.get(item):
