@@ -227,7 +227,6 @@ class KarmaBot(App):
             ids_to_names = {}
             if request["ok"]:
                 for member in request["members"]:
-                    self.logger.debug("WRIDEOUT member" + str(member))
                     try:
                         name = member.get("real_name") or member.get("name")
                         assert name
