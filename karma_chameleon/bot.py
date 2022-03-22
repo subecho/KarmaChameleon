@@ -206,7 +206,12 @@ class KarmaBot(App):
             if request["ok"]:
                 for member in request["members"]:
                     self.logger.debug("WRIDEOUT member" + str(member))
-                    ids_to_names[member["id"]] = member["real_name"] or member["name"]
+                    try:
+                        name = member.get("real_name") or member.get("name")
+                        assert name
+                        ids_to_names[member["id"]] = name
+                    except AssertionError:
+                        self.logger.debug("Unable to get name for id %s", member["id"])
 
             # Convert user IDs to actual names
             usr_table = []
