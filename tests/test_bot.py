@@ -23,6 +23,8 @@ from slack_sdk.errors import SlackApiError
 from karma_chameleon.bot import KarmaBot
 from karma_chameleon.karma_item import KarmaItem
 
+from pdb import set_trace as pdb
+
 
 @mock.patch.dict(
     os.environ,
@@ -153,11 +155,11 @@ class TestBot(TestCase):
             "members": [
                 {
                     "id": "U12345",
-                    "name": "Ada Lovelace",
+                    "real_name": "Ada Lovelace",
                 },
                 {
                     "id": "U67890",
-                    "name": "Grace Hopper",
+                    "real_name": "Grace Hopper",
                 },
             ],
         }
@@ -184,7 +186,7 @@ class TestBot(TestCase):
             (8, 3),
         ]
 
-        with open(self.karma_file_path, "w") as json_file:
+        with open(self.karma_file_path, "w", encoding="utf-8") as json_file:
             json.dump(
                 [
                     {"name": item, "pluses": 5 + i, "minuses": i}
@@ -225,7 +227,7 @@ class TestBot(TestCase):
         """
         web_client.side_effect = SlackApiError("test error", None)
 
-        with open(self.karma_file_path, "w") as json_file:
+        with open(self.karma_file_path, "w", encoding="utf-8") as json_file:
             json.dump(
                 [{"name": "foobar", "pluses": 9000, "minuses": 9000}],
                 json_file,

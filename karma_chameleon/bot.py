@@ -28,6 +28,8 @@ from slack_bolt import App
 from slack_sdk import WebClient
 from slack_sdk.errors import SlackApiError
 
+from pdb import set_trace as pdb
+
 from karma_chameleon.karma_item import KarmaItem, KarmaItemEncoder
 from karma_chameleon.snark import get_positive_message, get_negative_message
 
@@ -195,10 +197,10 @@ class KarmaBot(App):
                     user_table.append(Row(name, pluses, minuses, delta))
                 else:
                     thing_table.append(Row(name, pluses, minuses, delta))
-        except ValueError:  # Empty file or no file present
+            assert user_table or thing_table
+        except (ValueError, AssertionError):  # Empty file or no file present
             self.logger.exception("Empty karma file or no file present, return.")
             return ("No karma yet!", "", "")
-
         try:
             web_client = WebClient(token=os.environ.get("SLACK_BOT_TOKEN"))
             request = web_client.users_list()
@@ -208,25 +210,30 @@ class KarmaBot(App):
                     ids_to_names[member["id"]] = member["real_name"]
 
             # Convert user IDs to actual names
+            usr_table = []
             for row in user_table:
                 if row.name in ids_to_names:
-                    row.name = ids_to_names[row.name]
+                    name = ids_to_names[row.name]
+                    usr_table.append(Row(name, row.pluses, row.minuses, row.net_score))
+                else:
+                    usr_table.append(row)
 
-            user_table = sorted(user_table, key=lambda x: x.name)
+
+            usr_table = sorted(usr_table, key=lambda x: x.name)
             thing_table = sorted(thing_table, key=lambda x: x.name)
 
             headers = ["Name", "Pluses", "Minuses", "Net Score"]
-            users = tabulate([list[row] for row in user_table], headers, tablefmt="grid")
+            users = tabulate([list(row) for row in usr_table], headers, tablefmt="github")
             things = tabulate(
-                [list[row] for row in thing_table],
+                [list(row) for row in thing_table],
                 headers,
-                tablefmt="grid"
+                tablefmt="github"
             )
 
             return (
                 "",
-                f"User leaderboard:\n {users}",
-                f"Thing leaderboard:\n {things}",
+                f"User leaderboard:\n ```{users}```",
+                f"Thing leaderboard:\n ```{things}```",
             )
 
         except SlackApiError as api_err:
