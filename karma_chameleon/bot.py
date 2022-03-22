@@ -204,7 +204,7 @@ class KarmaBot(App):
             request = web_client.users_list()
             ids_to_names = {}
             if request["ok"]:
-                print(request)
+                self.logger.debug("WRIDEOUT request" + request)
                 for member in request["members"]:
                     ids_to_names[member["id"]] = member["real_name"]
 
