@@ -56,7 +56,7 @@ class TestBot(TestCase):
             token=os.environ.get("SLACK_BOT_TOKEN"),
         )
         assert os.path.exists(self.karma_file_path)
-        assert bot.karma == {}
+        assert not bot.karma
 
         with open(self.karma_file_path, "w", encoding="utf-8") as file_ptr:
             file_ptr.write('[{"name": "foobar", "pluses": 1, "minuses": 1}]')
@@ -121,7 +121,7 @@ class TestBot(TestCase):
         bot = KarmaBot(
             token=os.environ.get("SLACK_BOT_TOKEN"),
         )
-        assert bot.karma == {}
+        assert not bot.karma
         for count in range(1, 2):
             msg = bot.increment_karma({"user": "foobar", "text": "@GraceHopper++"})
             assert f"GraceHopper now has {count} points" in msg
