@@ -16,13 +16,14 @@ Defines the bot that which is passed Slack event message text and responds to th
 accordingly
 """
 
+from collections import namedtuple
 import os
 import logging
 import re
 import json
 from pathlib import Path
 from typing import Tuple
-import pandas as pd
+from tabulate import tabulate
 from slack_bolt import App
 from slack_sdk import WebClient
 from slack_sdk.errors import SlackApiError
@@ -59,10 +60,10 @@ class KarmaBot(App):
         karma_file = Path(self.karma_file_path)
         if not karma_file.is_file():
             self.logger.debug("No existing karma file found. Will start fresh.")
-            with open(self.karma_file_path, "w") as file_ptr:
+            with open(self.karma_file_path, "w", encoding="utf-8") as file_ptr:
                 file_ptr.write("[]")
             return
-        with open(self.karma_file_path, "r") as file_ptr:
+        with open(self.karma_file_path, "r", encoding="utf-8") as file_ptr:
             karma_list = json.load(file_ptr, object_hook=KarmaItem.dict_to_karmaitem)
         for item in karma_list:
             self.karma[item.name] = item
@@ -70,7 +71,7 @@ class KarmaBot(App):
     def _save_karma_to_json_file(self) -> None:
         self.logger.debug("Saving karma JSON to file %s", self.karma_file_path)
         karma_list = list(self.karma.values())
-        with open(self.karma_file_path, "w") as file_ptr:
+        with open(self.karma_file_path, "w", encoding="utf-8") as file_ptr:
             json.dump(karma_list, file_ptr, cls=KarmaItemEncoder)
 
     @staticmethod
@@ -173,53 +174,69 @@ class KarmaBot(App):
         A message, if applicable, a string representation of the user leaderboard, and a
         string representation of the thing leaderboard.
         """
+        Row = namedtuple("Row", "name pluses minuses net_score")
         try:
-            cur_karma = pd.read_json(self.karma_file_path)
+            with open(self.karma_file_path, "r", encoding="utf-8") as karma_file:
+                cur_karma = json.load(karma_file)
 
-            cur_karma["Net score"] = cur_karma.apply(
-                lambda x: x["pluses"] - x["minuses"], axis=1
-            )
-            usr_karma = cur_karma[cur_karma["name"].str.startswith("<@")]
-            thing_karma = pd.concat([cur_karma, usr_karma]).drop_duplicates(keep=False)
-        except ValueError:  # Empty file or no file present
+            user_table = []
+            thing_table = []
+            for item in cur_karma:
+                name = item["name"]
+                pluses = item["pluses"]
+                minuses = item["minuses"]
+                delta = pluses - minuses
+
+                if name.startswith("<@"):
+                    name = name.lstrip("<@").rstrip(">")
+                    user_table.append(Row(name, pluses, minuses, delta))
+                elif name.startswith("<!"):  # Special case for @everyone, @channel, @here
+                    name = name.lstrip("<!").rstrip(">")
+                    user_table.append(Row(name, pluses, minuses, delta))
+                else:
+                    thing_table.append(Row(name, pluses, minuses, delta))
+            assert user_table or thing_table
+        except (ValueError, AssertionError):  # Empty file or no file present
             self.logger.exception("Empty karma file or no file present, return.")
             return ("No karma yet!", "", "")
-
         try:
-            # Add @here, @everyone, and @channel to the user list. Specific channels can
-            # remain in the thing list.
-            odd_karma = cur_karma[cur_karma["name"].str.startswith("<!")]
-            thing_karma = pd.concat([thing_karma, odd_karma]).drop_duplicates(keep=False)
-            odd_karma["name"] = odd_karma["name"].map(
-                lambda x: x.lstrip("<!").rstrip(">")
-            )
-
             web_client = WebClient(token=os.environ.get("SLACK_BOT_TOKEN"))
             request = web_client.users_list()
-            rows = []
+            ids_to_names = {}
             if request["ok"]:
-                for item in request["members"]:
-                    rows.append([item["id"], item["name"]])
-            ids_to_names = pd.DataFrame(rows, columns=["name", "real_name"])
-            ids_to_names["name"] = "<@" + ids_to_names["name"] + ">"
-            usr_karma = pd.merge(usr_karma, ids_to_names, on="name", how="inner")
-            usr_karma["name"] = usr_karma["real_name"]
-            del usr_karma["real_name"]
+                for member in request["members"]:
+                    self.logger.debug("WRIDEOUT member" + str(member))
+                    try:
+                        name = member.get("real_name") or member.get("name")
+                        assert name
+                        ids_to_names[member["id"]] = name
+                    except AssertionError:
+                        self.logger.debug("Unable to get name for id %s", member["id"])
 
-            usr_karma = usr_karma.append(odd_karma)
+            # Convert user IDs to actual names
+            usr_table = []
+            for row in user_table:
+                if row.name in ids_to_names:
+                    name = ids_to_names[row.name]
+                    usr_table.append(Row(name, row.pluses, row.minuses, row.net_score))
+                else:
+                    usr_table.append(row)
 
-            usr_karma = usr_karma.sort_values(by=["Net score"], ascending=False)
-            thing_karma = thing_karma.sort_values(by=["Net score"], ascending=False)
-            thing_karma = thing_karma.head(10)
-            usr_karma = usr_karma.head(10)
+            usr_table = sorted(usr_table, reverse=True, key=lambda x: x.net_score)[:10]
+            thing_table = sorted(thing_table, reverse=True, key=lambda x: x.net_score)[
+                :10
+            ]
 
-            usr_karma = "```" + usr_karma.to_markdown(index=False) + "```"
-            thing_karma = "```" + thing_karma.to_markdown(index=False) + "```"
+            headers = ["Name", "Pluses", "Minuses", "Net Score"]
+            users = tabulate([list(row) for row in usr_table], headers, tablefmt="github")
+            things = tabulate(
+                [list(row) for row in thing_table], headers, tablefmt="github"
+            )
 
             return (
                 "",
-                f"User leaderboard:\n {usr_karma}",
-                f"Thing leaderboard:\n {thing_karma}",
+                f"User leaderboard:\n ```{users}```",
+                f"Thing leaderboard:\n ```{things}```",
             )
 
         except SlackApiError as api_err:

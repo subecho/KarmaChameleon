@@ -56,9 +56,9 @@ class TestBot(TestCase):
             token=os.environ.get("SLACK_BOT_TOKEN"),
         )
         assert os.path.exists(self.karma_file_path)
-        assert bot.karma == {}
+        assert not bot.karma
 
-        with open(self.karma_file_path, "w") as file_ptr:
+        with open(self.karma_file_path, "w", encoding="utf-8") as file_ptr:
             file_ptr.write('[{"name": "foobar", "pluses": 1, "minuses": 1}]')
 
         bot._load_karma_from_json_file()
@@ -68,7 +68,7 @@ class TestBot(TestCase):
 
         bot.karma["baz"] = KarmaItem("baz", 10, 10)
         bot._save_karma_to_json_file()
-        with open(self.karma_file_path, "r") as file_ptr:
+        with open(self.karma_file_path, "r", encoding="utf-8") as file_ptr:
             lines = file_ptr.readline()
             assert "baz" in lines
 
@@ -121,7 +121,7 @@ class TestBot(TestCase):
         bot = KarmaBot(
             token=os.environ.get("SLACK_BOT_TOKEN"),
         )
-        assert bot.karma == {}
+        assert not bot.karma
         for count in range(1, 2):
             msg = bot.increment_karma({"user": "foobar", "text": "@GraceHopper++"})
             assert f"GraceHopper now has {count} points" in msg
@@ -153,11 +153,11 @@ class TestBot(TestCase):
             "members": [
                 {
                     "id": "U12345",
-                    "name": "Ada Lovelace",
+                    "real_name": "Ada Lovelace",
                 },
                 {
                     "id": "U67890",
-                    "name": "Grace Hopper",
+                    "real_name": "Grace Hopper",
                 },
             ],
         }
@@ -184,7 +184,7 @@ class TestBot(TestCase):
             (8, 3),
         ]
 
-        with open(self.karma_file_path, "w") as json_file:
+        with open(self.karma_file_path, "w", encoding="utf-8") as json_file:
             json.dump(
                 [
                     {"name": item, "pluses": 5 + i, "minuses": i}
@@ -225,7 +225,7 @@ class TestBot(TestCase):
         """
         web_client.side_effect = SlackApiError("test error", None)
 
-        with open(self.karma_file_path, "w") as json_file:
+        with open(self.karma_file_path, "w", encoding="utf-8") as json_file:
             json.dump(
                 [{"name": "foobar", "pluses": 9000, "minuses": 9000}],
                 json_file,
