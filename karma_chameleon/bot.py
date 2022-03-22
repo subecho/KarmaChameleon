@@ -216,16 +216,13 @@ class KarmaBot(App):
                 else:
                     usr_table.append(row)
 
-
             usr_table = sorted(usr_table, key=lambda x: x.name)
             thing_table = sorted(thing_table, key=lambda x: x.name)
 
             headers = ["Name", "Pluses", "Minuses", "Net Score"]
             users = tabulate([list(row) for row in usr_table], headers, tablefmt="github")
             things = tabulate(
-                [list(row) for row in thing_table],
-                headers,
-                tablefmt="github"
+                [list(row) for row in thing_table], headers, tablefmt="github"
             )
 
             return (
