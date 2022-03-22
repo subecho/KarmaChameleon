@@ -60,10 +60,10 @@ class KarmaBot(App):
         karma_file = Path(self.karma_file_path)
         if not karma_file.is_file():
             self.logger.debug("No existing karma file found. Will start fresh.")
-            with open(self.karma_file_path, "w") as file_ptr:
+            with open(self.karma_file_path, "w", encoding="utf-8") as file_ptr:
                 file_ptr.write("[]")
             return
-        with open(self.karma_file_path, "r") as file_ptr:
+        with open(self.karma_file_path, "r", encoding="utf-8") as file_ptr:
             karma_list = json.load(file_ptr, object_hook=KarmaItem.dict_to_karmaitem)
         for item in karma_list:
             self.karma[item.name] = item
@@ -71,7 +71,7 @@ class KarmaBot(App):
     def _save_karma_to_json_file(self) -> None:
         self.logger.debug("Saving karma JSON to file %s", self.karma_file_path)
         karma_list = list(self.karma.values())
-        with open(self.karma_file_path, "w") as file_ptr:
+        with open(self.karma_file_path, "w", encoding="utf-8") as file_ptr:
             json.dump(karma_list, file_ptr, cls=KarmaItemEncoder)
 
     @staticmethod
@@ -176,57 +176,67 @@ class KarmaBot(App):
         """
         Row = namedtuple("Row", "name pluses minuses net_score")
         try:
-            with open(self.karma_file_path, "r", encoding="utf-8") as f:
-                cur_karma = json.load(f)
+            with open(self.karma_file_path, "r", encoding="utf-8") as karma_file:
+                cur_karma = json.load(karma_file)
 
             user_table = []
             thing_table = []
             for item in cur_karma:
                 name = item["name"]
-                delta = item["pluses"] - item["minuses"]
-                row = Row(name, item["pluses"], item["minuses"], delta)
+                pluses = item["pluses"]
+                minuses = item["minuses"]
+                delta = pluses - minuses
 
                 if name.startswith("<@"):
                     name = name.lstrip("<@").rstrip(">")
-                    user_table.append(row)
+                    user_table.append(Row(name, pluses, minuses, delta))
                 elif name.startswith("<!"):  # Special case for @everyone, @channel, @here
                     name = name.lstrip("<!").rstrip(">")
-                    row.name = name
-                    user_table.append(row)
+                    user_table.append(Row(name, pluses, minuses, delta))
                 else:
-                    thing_table.append(row)
-        except ValueError:  # Empty file or no file present
+                    thing_table.append(Row(name, pluses, minuses, delta))
+            assert user_table or thing_table
+        except (ValueError, AssertionError):  # Empty file or no file present
             self.logger.exception("Empty karma file or no file present, return.")
             return ("No karma yet!", "", "")
-
         try:
             web_client = WebClient(token=os.environ.get("SLACK_BOT_TOKEN"))
             request = web_client.users_list()
             ids_to_names = {}
             if request["ok"]:
                 for member in request["members"]:
-                    ids_to_names[member["id"]] = member["real_name"]
+                    self.logger.debug("WRIDEOUT member" + str(member))
+                    try:
+                        name = member.get("real_name") or member.get("name")
+                        assert name
+                        ids_to_names[member["id"]] = name
+                    except AssertionError:
+                        self.logger.debug("Unable to get name for id %s", member["id"])
 
             # Convert user IDs to actual names
+            usr_table = []
             for row in user_table:
                 if row.name in ids_to_names:
-                    row.name = ids_to_names[row.name]
+                    name = ids_to_names[row.name]
+                    usr_table.append(Row(name, row.pluses, row.minuses, row.net_score))
+                else:
+                    usr_table.append(row)
 
-            user_table = sorted(user_table, key=lambda x: x.name)
-            thing_table = sorted(thing_table, key=lambda x: x.name)
+            usr_table = sorted(usr_table, reverse=True, key=lambda x: x.net_score)[:10]
+            thing_table = sorted(thing_table, reverse=True, key=lambda x: x.net_score)[
+                :10
+            ]
 
             headers = ["Name", "Pluses", "Minuses", "Net Score"]
-            users = tabulate([list[row] for row in user_table], headers, tablefmt="grid")
+            users = tabulate([list(row) for row in usr_table], headers, tablefmt="github")
             things = tabulate(
-                [list[row] for row in thing_table],
-                headers,
-                tablefmt="grid"
+                [list(row) for row in thing_table], headers, tablefmt="github"
             )
 
             return (
                 "",
-                f"User leaderboard:\n {users}",
-                f"Thing leaderboard:\n {things}",
+                f"User leaderboard:\n ```{users}```",
+                f"Thing leaderboard:\n ```{things}```",
             )
 
         except SlackApiError as api_err:
