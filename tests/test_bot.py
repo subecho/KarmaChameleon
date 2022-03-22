@@ -117,7 +117,7 @@ class TestBot(TestCase):
         self.cleanup()
 
     def test_detect_url(self, _) -> None:
-        """Test the ability of KarmnaBot to detect a URL which contains either the -- 
+        """Test the ability of KarmnaBot to detect a URL which contains either the --
         token.
         """
         cases = [
