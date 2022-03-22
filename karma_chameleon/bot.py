@@ -204,8 +204,7 @@ class KarmaBot(App):
             request = web_client.users_list()
             ids_to_names = {}
             if request["ok"]:
-                from pdb import set_trace as pdb
-                pdb()
+                print(request)
                 for member in request["members"]:
                     ids_to_names[member["id"]] = member["real_name"]
 
