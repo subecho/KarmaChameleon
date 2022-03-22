@@ -28,8 +28,6 @@ from slack_bolt import App
 from slack_sdk import WebClient
 from slack_sdk.errors import SlackApiError
 
-from pdb import set_trace as pdb
-
 from karma_chameleon.karma_item import KarmaItem, KarmaItemEncoder
 from karma_chameleon.snark import get_positive_message, get_negative_message
 
