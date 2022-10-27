@@ -16,20 +16,19 @@ Defines the bot that which is passed Slack event message text and responds to th
 accordingly
 """
 
-from collections import namedtuple
-import os
+import json
 import logging
 import os
 import re
-import json
+from collections import namedtuple
 from pathlib import Path
 from typing import Tuple
-from tabulate import tabulate
 from typing import Union
 
 from slack_bolt import App
 from slack_sdk import WebClient
 from slack_sdk.errors import SlackApiError
+from tabulate import tabulate
 
 from karma_chameleon.karma_item import KarmaItem, KarmaItemEncoder
 from karma_chameleon.snark import get_positive_message, get_negative_message
@@ -107,7 +106,7 @@ class KarmaBot(App):
     @staticmethod
     def _check_for_url(msg: dict) -> bool:
         """Returns True if the passed message text contains the -- token as part of a
-        larger URL stirng.
+        larger URL string.
 
         The URL regex is shamelessly copied from https://urlregex.com/.
         """
@@ -192,7 +191,10 @@ class KarmaBot(App):
         self.logger.debug("Got decrement for %s", item)
         return f"{snark} {item} now has {total} points."
 
-    def display_karma_leaderboards(self) -> Tuple[str, str, str]:
+    # TODO(dschoenbrun): Refactor the function below because it has too many local variables and
+    #  is too complex.
+    # pylint: disable=too-many-locals
+    def display_karma_leaderboards(self) -> Tuple[str, str, str]:  # noqa: C901
         """Prints rudimentary user and thing leaderboards.
 
         Returns:
@@ -223,7 +225,7 @@ class KarmaBot(App):
             assert user_table or thing_table
         except (ValueError, AssertionError):  # Empty file or no file present
             self.logger.exception("Empty karma file or no file present, return.")
-            return ("No karma yet!", "", "")
+            return "No karma yet!", "", ""
         try:
             web_client = WebClient(token=os.environ.get("SLACK_BOT_TOKEN"))
             request = web_client.users_list()
@@ -247,15 +249,11 @@ class KarmaBot(App):
                     usr_table.append(row)
 
             usr_table = sorted(usr_table, reverse=True, key=lambda x: x.net_score)[:10]
-            thing_table = sorted(thing_table, reverse=True, key=lambda x: x.net_score)[
-                :10
-            ]
+            thing_table = sorted(thing_table, reverse=True, key=lambda x: x.net_score)[:10]
 
             headers = ["Name", "Pluses", "Minuses", "Net Score"]
             users = tabulate([list(row) for row in usr_table], headers, tablefmt="github")
-            things = tabulate(
-                [list(row) for row in thing_table], headers, tablefmt="github"
-            )
+            things = tabulate([list(row) for row in thing_table], headers, tablefmt="github")
 
             return (
                 "",
@@ -265,4 +263,4 @@ class KarmaBot(App):
 
         except SlackApiError as api_err:
             self.logger.error("Failed to generate leaderboard due to %s", api_err)
-            return ("", "", "")
+            return "", "", ""
