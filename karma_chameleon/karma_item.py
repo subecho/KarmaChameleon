@@ -29,25 +29,23 @@ class KarmaItem:
         self.minuses = minuses
 
     def __repr__(self) -> str:
-        return self.__class__.__name__ + "({!r}, {!r}, {!r})".format(
-            self.name, self.pluses, self.minuses
-        )
+        return self.__class__.__name__ + f"('{self.name}', {self.pluses}, {self.minuses})"
 
     def __str__(self) -> str:
         if self.pluses == 1:
             pluses_msg = " has 1 plus "
         else:
-            pluses_msg = " has %s pluses " % self.pluses
+            pluses_msg = f" has {self.pluses} pluses "
 
         if self.minuses == 1:
             minuses_msg = "and 1 minus "
         else:
-            minuses_msg = "and %s minuses " % self.minuses
+            minuses_msg = f"and {self.minuses} minuses "
 
         if self.total_score == 1:
             total_msg = "for a total of 1 point."
         else:
-            total_msg = "for a total of %s points." % self.total_score
+            total_msg = f"for a total of {self.total_score} points."
 
         return self.name + pluses_msg + minuses_msg + total_msg
 
@@ -61,7 +59,7 @@ class KarmaItem:
         return self.pluses - self.minuses
 
     @staticmethod
-    def dict_to_karmaitem(a_dict: dict) -> dict:
+    def dict_to_karma_item(a_dict: dict):
         """
         Return a KarmaItem if a_dict is a representation of a KarmaItem or a_dict
         unmodified otherwise.

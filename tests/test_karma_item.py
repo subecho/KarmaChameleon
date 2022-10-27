@@ -15,8 +15,8 @@
 Unit testing for the KarmaChameleon KarmaItem class.
 """
 
-import unittest
 from unittest import TestCase
+
 from karma_chameleon.karma_item import KarmaItem, KarmaItemEncoder
 
 
@@ -54,7 +54,7 @@ class TestKarmaItem(TestCase):
             "pluses": 60,
             "minuses": 10,
         }
-        karma = KarmaItem.dict_to_karmaitem(karma_dict)
+        karma = KarmaItem.dict_to_karma_item(karma_dict)
         assert isinstance(karma, KarmaItem)
         assert karma.name == karma_dict["name"]
         assert karma.pluses == karma_dict["pluses"]
@@ -64,7 +64,7 @@ class TestKarmaItem(TestCase):
             "foo": "foo",
             "bar": "bar",
         }
-        output = KarmaItem.dict_to_karmaitem(input_dict)
+        output = KarmaItem.dict_to_karma_item(input_dict)
         assert output == input_dict
 
     @staticmethod
@@ -85,7 +85,3 @@ class TestKarmaItem(TestCase):
         except TypeError:
             failed = True
         assert failed
-
-
-if __name__ == "__main__":
-    unittest.main()

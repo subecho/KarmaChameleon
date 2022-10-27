@@ -15,8 +15,8 @@
 Unit testing for the KarmaChameleon snark.
 """
 
-import unittest
 from unittest import TestCase
+
 from karma_chameleon import snark
 
 
@@ -33,7 +33,3 @@ class TestSnark(TestCase):
         msg = snark.get_negative_message()
         assert msg
         assert msg in snark.negative_messages
-
-
-if __name__ == "__main__":
-    unittest.main()

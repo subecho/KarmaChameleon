@@ -19,11 +19,14 @@ accordingly
 from collections import namedtuple
 import os
 import logging
+import os
 import re
 import json
 from pathlib import Path
 from typing import Tuple
 from tabulate import tabulate
+from typing import Union
+
 from slack_bolt import App
 from slack_sdk import WebClient
 from slack_sdk.errors import SlackApiError
@@ -64,7 +67,7 @@ class KarmaBot(App):
                 file_ptr.write("[]")
             return
         with open(self.karma_file_path, "r", encoding="utf-8") as file_ptr:
-            karma_list = json.load(file_ptr, object_hook=KarmaItem.dict_to_karmaitem)
+            karma_list = json.load(file_ptr, object_hook=KarmaItem.dict_to_karma_item)
         for item in karma_list:
             self.karma[item.name] = item
 
@@ -120,7 +123,7 @@ class KarmaBot(App):
                 return re.match(url_re, word) is not None
         return False
 
-    def get_username_from_uid(self, uid: str) -> str:
+    def get_username_from_uid(self, uid: str) -> Union[str, None]:
         """Fetch the username corresponding to the passed UID string."""
         if not uid:
             return None
@@ -159,7 +162,7 @@ class KarmaBot(App):
         total = self.karma[item].total_score
         self._save_karma_to_json_file()
         self.logger.debug("Got increment for %s", item)
-        return f"{snark} {item} now has {total} points{tail}."
+        return f"{snark} {item} now has {total} points{tail}"
 
     def decrement_karma(self, msg: dict) -> str:
         """Decrement karma for a passed item, and pass a corresponding message to the
@@ -174,7 +177,7 @@ class KarmaBot(App):
         self.logger.debug("Processing decrement message.")
         if self._check_for_self_bump(msg):
             self.logger.debug("Skipping self-decrement")
-            return "Now, now.  Don't be so hard on yourself!"
+            return "Now, now. Don't be so hard on yourself!"
 
         if self._check_for_url(msg):
             return None  # Fail silently... no need to respond to the user.

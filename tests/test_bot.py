@@ -17,8 +17,6 @@ Unit testing for the KarmaChameleon KarmaBot class.
 import os
 from unittest import TestCase
 from unittest import mock
-import json
-from slack_sdk.errors import SlackApiError
 
 from karma_chameleon.bot import KarmaBot
 from karma_chameleon.karma_item import KarmaItem
@@ -56,7 +54,7 @@ class TestBot(TestCase):
             token=os.environ.get("SLACK_BOT_TOKEN"),
         )
         assert os.path.exists(self.karma_file_path)
-        assert not bot.karma
+        assert not bot.karma  # No karma from empty file.
 
         with open(self.karma_file_path, "w", encoding="utf-8") as file_ptr:
             file_ptr.write('[{"name": "foobar", "pluses": 1, "minuses": 1}]')
@@ -152,7 +150,7 @@ class TestBot(TestCase):
         msg = bot.increment_karma({"user": "GraceHopper", "text": "@GraceHopper++"})
         assert msg == "Ahem, no self-karma please!"
         msg = bot.decrement_karma({"user": "GraceHopper", "text": "@GraceHopper--"})
-        assert msg == "Now, now.  Don't be so hard on yourself!"
+        assert msg == "Now, now. Don't be so hard on yourself!"
         self.cleanup()
 
     @mock.patch("slack_sdk.WebClient.users_list")
