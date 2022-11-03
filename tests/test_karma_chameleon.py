@@ -15,12 +15,12 @@
 Unit testing for the KarmaChameleon App proper.
 """
 
-import os
+import contextlib
 import io
-import unittest
+import os
 from unittest import TestCase
 from unittest import mock
-import contextlib
+
 from slack_bolt import BoltResponse, Ack
 
 with mock.patch.dict(
@@ -35,7 +35,6 @@ with mock.patch.dict(
             handle_no_karma_op,
             increment,
             decrement,
-            show_leaderboard,
         )
 
 
@@ -128,27 +127,3 @@ class TestApp(TestCase):
             decrement(self.test_msg, self._say_method)
             assert app_dec_karma.inc_karma.called_with(self.test_msg)
             assert out.getvalue() == msg
-
-    @mock.patch("karma_chameleon.bot.KarmaBot.display_karma_leaderboards")
-    def test_show_leaderboard(self, app_leaderboard):
-        """Test the method of the main app which calls the bot leaderboard method."""
-        ack = self.SpoofAck()
-        cases = [
-            ("", "", ""),
-            ("msg", "", ""),
-            ("", "users", ""),
-            ("", "", "things"),
-            ("msg", "users", "things"),
-        ]
-        for case in cases:
-            app_leaderboard.return_value = case
-            with contextlib.redirect_stdout(io.StringIO()) as out:
-                show_leaderboard(ack, self._say_method)
-                assert ack.ack_msg in out.getvalue()
-                for member_c in case:
-                    if member_c:
-                        assert member_c in out.getvalue()
-
-
-if __name__ == "__main__":
-    unittest.main()

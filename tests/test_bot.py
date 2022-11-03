@@ -13,11 +13,11 @@
 """
 Unit testing for the KarmaChameleon KarmaBot class.
 """
-
+import json
 import os
 from unittest import TestCase
 from unittest import mock
-import json
+
 from slack_sdk.errors import SlackApiError
 
 from karma_chameleon.bot import KarmaBot
@@ -56,7 +56,7 @@ class TestBot(TestCase):
             token=os.environ.get("SLACK_BOT_TOKEN"),
         )
         assert os.path.exists(self.karma_file_path)
-        assert not bot.karma
+        assert not bot.karma  # No karma from empty file.
 
         with open(self.karma_file_path, "w", encoding="utf-8") as file_ptr:
             file_ptr.write('[{"name": "foobar", "pluses": 1, "minuses": 1}]')
@@ -117,7 +117,7 @@ class TestBot(TestCase):
         self.cleanup()
 
     def test_detect_url(self, _) -> None:
-        """Test the ability of KarmnaBot to detect a URL which contains either the --
+        """Test the ability of KarmaBot to detect a URL which contains either the --
         token.
         """
         cases = [
@@ -152,7 +152,7 @@ class TestBot(TestCase):
         msg = bot.increment_karma({"user": "GraceHopper", "text": "@GraceHopper++"})
         assert msg == "Ahem, no self-karma please!"
         msg = bot.decrement_karma({"user": "GraceHopper", "text": "@GraceHopper--"})
-        assert msg == "Now, now.  Don't be so hard on yourself!"
+        assert msg == "Now, now. Don't be so hard on yourself!"
         self.cleanup()
 
     @mock.patch("slack_sdk.WebClient.users_list")
@@ -210,7 +210,7 @@ class TestBot(TestCase):
             )
 
         _, users_text, things_text = bot.display_karma_leaderboards()
-        # Remove the trailling "```" from markdown syntax, then split by line,
+        # Remove the trailing "```" from markdown syntax, then split by line,
         # ignoring the first three lines which are header.
         things_text = things_text[:-3].split("\n")[3:]
         for item, karma, text in zip(test_items[:2], test_karma[:2], things_text):

@@ -1,4 +1,4 @@
-# Karma Chameleon Copyright (C) 2021 Dustin Schoenbrun, Will Rideout, Ben Decato
+# Karma Chameleon Copyright (C) 2022 Dustin Schoenbrun, Will Rideout, Ben Decato
 #
 # This program is free software: you can redistribute it and/or modify it under the terms
 # of the GNU General Public License as published by the Free Software Foundation, either
@@ -18,13 +18,13 @@ A simple Slack bot which allows users to assign karma to each other or things vi
 of "++" and "--" in messages.
 """
 
-import os
 import logging
+import os
 from logging.handlers import RotatingFileHandler
 from typing import Callable, Union
+
 from slack_bolt import Ack, BoltResponse, Say
 from slack_bolt.adapter.socket_mode import SocketModeHandler
-
 
 from karma_chameleon.bot import KarmaBot
 
@@ -42,13 +42,9 @@ if not os.path.exists("logs"):
 # inherited by all sub-loggers.
 logger = logging.getLogger("karma_chameleon")
 logger.setLevel(logging.DEBUG)
-file_handler = RotatingFileHandler(
-    "logs/karma_chameleon.log", maxBytes=10_000_000, backupCount=3
-)
+file_handler = RotatingFileHandler("logs/karma_chameleon.log", maxBytes=10_000_000, backupCount=3)
 file_handler.setLevel(logging.DEBUG)
-formatter = logging.Formatter(
-    "%(asctime)s %(name)s %(levelname)s[%(funcName)s]: %(message)s"
-)
+formatter = logging.Formatter("%(asctime)s %(name)s %(levelname)s[%(funcName)s]: %(message)s")
 file_handler.setFormatter(formatter)
 logger.addHandler(file_handler)
 
@@ -95,7 +91,7 @@ def handle_no_karma_op(
             return next()
     # This is too chatty to be left enabled, but it may be useful for debug in the future.
     # logger.debug("Ignoring event with no karma operation")
-    return BoltResponse(status=200, body="Ignoring event with no karma operation")
+    return BoltResponse(status=200, body="Ignoring event with no karma operation.")
 
 
 @app.command("/k")
@@ -134,7 +130,7 @@ def handle_karma_command(ack: Ack, say: Say, command: dict) -> None:
         if rsp:
             say(rsp)
     else:
-        say("Hmmm... this doesn't look right.  Syntax is '/k SUBJECT (++|--) [FLAVOR]")
+        say("Hmmm... this doesn't look right.  Syntax is '/k SUBJECT (++|--) [FLAVOR]'")
 
 
 @app.message(app.inc_regex)
@@ -177,13 +173,7 @@ def show_leaderboard(ack: Ack, say: Say) -> None:
     """
     # Must acknowledge the command was run.
     ack()
-    msg, users, things = app.display_karma_leaderboards()
-    if msg:
-        say(msg)
-    if users:
-        say(users)
-    if things:
-        say(things)
+    say("Hey! This is currently being reworked! Try again later :+1:")
 
 
 if __name__ == "__main__":

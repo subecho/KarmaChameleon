@@ -1,6 +1,6 @@
 [tool.black]
-line-length = 90
-target-version = ['py38']
+line-length = 100
+target-version = ['py311']
 include = '\.pyi?$'
 exclude = '''
 ^/(
@@ -40,12 +40,9 @@ jobs = 0
 suggestion-mode = "yes"
 
 [tool.pylint.FORMAT]
-max-line-length = 90
+max-line-length = 100
 expected-line-ending-format = "LF"
 
 [tool.pylint.BASIC]
 argument-naming-style = "snake_case"
 
-[tool.pylint.STRING]
-enforce-string-formatting-over-substitution = "yes"
-string-substitution-usage-is-an-error = "yes"
