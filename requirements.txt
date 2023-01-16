@@ -64,7 +64,7 @@ pytest==7.2.0
     #   pytest-cov
 pytest-cov==4.0.0
     # via -r requirements.in
-slack-bolt==1.15.5
+slack-bolt==1.16.1
     # via -r requirements.in
 slack-sdk==3.19.5
     # via slack-bolt
