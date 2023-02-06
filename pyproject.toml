@@ -35,14 +35,6 @@ branch = true
 [tool.coverage.report]
 precision = 2
 
-[tool.pylint.MASTER]
-jobs = 0
-suggestion-mode = "yes"
-
-[tool.pylint.FORMAT]
-max-line-length = 100
-expected-line-ending-format = "LF"
-
-[tool.pylint.BASIC]
-argument-naming-style = "snake_case"
-
+[tool.ruff]
+line-length = 100
+target-version = "py311"

@@ -111,8 +111,7 @@ class KarmaBot(App):
         The URL regex is shamelessly copied from https://urlregex.com/.
         """
         url_re = re.compile(
-            r"http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|"
-            r"(?:%[0-9a-fA-F][0-9a-fA-F]))+"
+            r"http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+"
         )
 
         for word in msg["text"].split():
