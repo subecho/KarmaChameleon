@@ -1,4 +1,4 @@
-# Karma Chameleon Copyright (C) 2021 Dustin Schoenbrun, Will Rideout, Ben Decato
+# Karma Chameleon Copyright (C) 2023 Dustin Schoenbrun, Will Rideout, Ben Decato
 #
 # This program is free software: you can redistribute it and/or modify it under the terms
 # of the GNU General Public License as published by the Free Software Foundation, either
@@ -110,9 +110,7 @@ class KarmaBot(App):
 
         The URL regex is shamelessly copied from https://urlregex.com/.
         """
-        url_re = re.compile(
-            r"http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+"
-        )
+        url_re = re.compile(r"https?://(?:[\w]|[$\-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+")
 
         for word in msg["text"].split():
             # As of the writing of this code, "++" is not able to be included, unencoded,
