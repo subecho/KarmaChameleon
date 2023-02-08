@@ -110,7 +110,7 @@ class KarmaBot(App):
 
         The URL regex is shamelessly copied from https://urlregex.com/.
         """
-        url_re = re.compile(r"https?://(?:[\w]|[$-_@.&+]|[!*\(\),]|(%[0-9a-fA-F][0-9a-fA-F]))+")
+        url_re = re.compile(r"https?://(?:[\w]|[$-_+]|[!*\(\),]|(%[0-9a-fA-F][0-9a-fA-F]))+")
 
         for word in msg["text"].split():
             # As of the writing of this code, "++" is not able to be included, unencoded,
