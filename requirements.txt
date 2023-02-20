@@ -50,7 +50,7 @@ pytest==7.2.1
     #   pytest-cov
 pytest-cov==4.0.0
     # via -r requirements.in
-ruff==0.0.241
+ruff==0.0.247
     # via -r requirements.in
 slack-bolt==1.16.1
     # via -r requirements.in
