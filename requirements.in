@@ -3,6 +3,6 @@ Flask ~= 2.3.2
 flake8 ~= 6.0.0
 pytest ~= 7.2.2
 pytest-cov ~= 4.0.0
-ruff ~= 0.0.263
+ruff ~= 0.0.269
 slack_bolt ~= 1.17.0
 tabulate ~= 0.9.0
