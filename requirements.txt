@@ -4,7 +4,7 @@
 #
 #    pip-compile --resolver=backtracking
 #
-black==23.7.0
+black==23.9.1
     # via -r requirements.in
 blinker==1.6.2
     # via flask
