@@ -1,7 +1,7 @@
 black ~= 23.9.1
 Flask ~= 2.3.3
 flake8 ~= 6.1.0
-pytest ~= 7.4.0
+pytest ~= 7.4.2
 pytest-cov ~= 4.1.0
 ruff ~= 0.0.284
 slack_bolt ~= 1.18.0
