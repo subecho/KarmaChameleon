@@ -29,8 +29,8 @@ from slack_bolt.adapter.socket_mode import SocketModeHandler
 from karma_chameleon.bot import KarmaBot
 
 # There is only one logger, with three different sub-loggers.  All loggers use the same
-# file destination, and line format.  The logger with UID "karma_chameleon" is used to log
-# events for the main app, i.e. the Flask app.  karma_chameleon.event_manager logs events
+# file destination and line format.  The logger with UID "karma_chameleon" is used to log
+# events for the main app, e.g., the Flask app.  karma_chameleon.event_manager logs events
 # and debug info pertaining to the event_manager.py methods.  karma_chameleon.bot logs
 # events and debug info pertaining to the methods of the KarmaBot class.
 #
@@ -176,5 +176,8 @@ def show_leaderboard(ack: Ack, say: Say) -> None:
     say("Hey! This is currently being reworked! Try again later :+1:")
 
 
-if __name__ == "__main__":
+def main():
     SocketModeHandler(app, os.environ["SLACK_APP_TOKEN"]).start()
+
+if __name__ == "__main__":
+    main()

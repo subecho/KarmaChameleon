@@ -1,26 +1,26 @@
+[project]
+name = "karmachameleon"
+version = "2.0.0"
+description = "A simple Karma Bot for Slack."
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = [
+    "black>=25.1.0",
+    "flake8>=7.2.0",
+    "flask>=3.1.1",
+    "pytest>=8.4.0",
+    "pytest-cov>=6.1.1",
+    "ruff>=0.11.13",
+    "slack-bolt>=1.23.0",
+]
+
+[project.scripts]
+karmachameleon = "karmachameleon.main:main"
+
 [tool.black]
 line-length = 100
-target-version = ['py311']
-include = '\.pyi?$'
-exclude = '''
-^/(
-  (
-      \.eggs         # exclude a few common directories in the
-    | \.git          # root of the project
-    | \.hg
-    | \.mypy_cache
-    | \.tox
-    | \.venv
-    | _build
-    | buck-out
-    | build
-    | dist
-  )/
-)
-'''
 
 [tool.pytest.ini_options]
-minversion = "6.2.2"
 addopts = "-ra -v --cov"
 
 [tool.coverage.run]
@@ -37,4 +37,3 @@ precision = 2
 
 [tool.ruff]
 line-length = 100
-target-version = "py311"
