@@ -98,12 +98,12 @@ class TestApp(TestCase):
     @mock.patch("karma_chameleon.bot.KarmaBot.increment_karma")
     def test_increment(self, app_inc_karma) -> None:
         """Test the method of the main app which calls the bot increment."""
-        msg = "Got the message!"
-        app_inc_karma.return_value = msg
+        for msg in ["Got the message!", ""]:
+            app_inc_karma.return_value = msg
 
         with contextlib.redirect_stdout(io.StringIO()) as out:
             increment(self.test_msg, self._say_method)
-            assert app_inc_karma.inc_karma.called_with(self.test_msg)
+            app_inc_karma.assert_called_with(self.test_msg)
             assert out.getvalue() == msg + "\n"
 
     @mock.patch("karma_chameleon.bot.KarmaBot.decrement_karma")
@@ -114,7 +114,7 @@ class TestApp(TestCase):
 
             with contextlib.redirect_stdout(io.StringIO()) as out:
                 decrement(self.test_msg, self._say_method)
-                assert app_dec_karma.inc_karma.called_with(self.test_msg)
+                app_dec_karma.assert_called_with(self.test_msg)
                 assert out.getvalue() == (msg + "\n" if msg else msg)
 
     @mock.patch("karma_chameleon.bot.KarmaBot.decrement_karma")
@@ -125,5 +125,5 @@ class TestApp(TestCase):
 
         with contextlib.redirect_stdout(io.StringIO()) as out:
             decrement(self.test_msg, self._say_method)
-            assert app_dec_karma.inc_karma.called_with(self.test_msg)
+            app_dec_karma.assert_called_with(self.test_msg)
             assert out.getvalue() == msg

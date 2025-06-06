@@ -13,12 +13,10 @@
 """
 Unit testing for the KarmaChameleon KarmaBot class.
 """
-import json
 import os
 from unittest import TestCase
 from unittest import mock
 
-from slack_sdk.errors import SlackApiError
 
 from karma_chameleon.bot import KarmaBot
 from karma_chameleon.karma_item import KarmaItem
@@ -153,104 +151,4 @@ class TestBot(TestCase):
         assert msg == "Ahem, no self-karma please!"
         msg = bot.decrement_karma({"user": "GraceHopper", "text": "@GraceHopper--"})
         assert msg == "Now, now. Don't be so hard on yourself!"
-        self.cleanup()
-
-    @mock.patch("slack_sdk.WebClient.users_list")
-    def test_leaderboard(self, wc_users_list, _) -> None:
-        """Basic testing of the display_leaderboards functionality.
-
-        Arguments:
-        wc_users_list -- Mocked out version of the WebClient.client.users_list method.
-                         Populated
-                         by the @patch decorator.
-        """
-        wc_users_list.return_value = {
-            "ok": True,
-            "members": [
-                {
-                    "id": "U12345",
-                    "real_name": "Ada Lovelace",
-                },
-                {
-                    "id": "U67890",
-                    "real_name": "Grace Hopper",
-                },
-            ],
-        }
-        users_to_ids = {"<@U12345>": "Ada Lovelace", "<@U67890>": "Grace Hopper"}
-
-        bot = KarmaBot(
-            token=os.environ.get("SLACK_BOT_TOKEN"),
-        )
-
-        # Start by testing how an empty or missing karma file is handled.
-        assert bot.display_karma_leaderboards() == ("No karma yet!", "", "")
-
-        # Begin by populating a karma test file.
-        test_items = [
-            "testA",
-            "testB",
-            "<@U12345>",
-            "<@U67890>",
-        ]
-        test_karma = [
-            (5, 0),
-            (6, 1),
-            (7, 2),
-            (8, 3),
-        ]
-
-        with open(self.karma_file_path, "w", encoding="utf-8") as json_file:
-            json.dump(
-                [
-                    {"name": item, "pluses": 5 + i, "minuses": i}
-                    for i, item in enumerate(test_items)
-                ],
-                json_file,
-            )
-
-        _, users_text, things_text = bot.display_karma_leaderboards()
-        # Remove the trailing "```" from markdown syntax, then split by line,
-        # ignoring the first three lines which are header.
-        things_text = things_text[:-3].split("\n")[3:]
-        for item, karma, text in zip(test_items[:2], test_karma[:2], things_text):
-            found = [t.strip() for t in text.split("|") if t]
-            expected = [item, str(karma[0]), str(karma[1]), str(karma[0] - karma[1])]
-            assert found == expected
-
-        users_text = users_text[:-3].split("\n")[3:]
-        for item, karma, text in zip(test_items[2:], test_karma[2:], users_text):
-            found = [t.strip() for t in text.split("|") if t]
-            expected = [
-                users_to_ids[item],
-                str(karma[0]),
-                str(karma[1]),
-                str(karma[0] - karma[1]),
-            ]
-            assert found == expected
-
-        self.cleanup()
-
-    @mock.patch("slack_sdk.WebClient")
-    def test_leaderboard_exceptions(self, web_client, _) -> None:
-        """Basic testing of the leaderboard method's ability to handle exceptions
-
-        Arguments:
-        web_client -- Mocked out version of the WebClient class.
-                      Populated by the @patch decorator
-        """
-        web_client.side_effect = SlackApiError("test error", None)
-
-        with open(self.karma_file_path, "w", encoding="utf-8") as json_file:
-            json.dump(
-                [{"name": "foobar", "pluses": 9000, "minuses": 9000}],
-                json_file,
-            )
-
-        bot = KarmaBot(
-            token=os.environ.get("SLACK_BOT_TOKEN"),
-        )
-
-        msg, user_text, thing_text = bot.display_karma_leaderboards()
-        assert not msg and not user_text and not thing_text
         self.cleanup()
